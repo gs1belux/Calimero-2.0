@@ -80,11 +80,12 @@
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG16/G_SG22[S_MOA/C_C516/D_5025 = '52']">
 			<let name="actualSegment" value="./S_TAX[last()]"/>
 			<let name="taxRate" value="number(./S_TAX/C_C243/D_5278)"/>
+			<let name="isEAB" value="number(if (/INTERCHANGE/M_INVOIC/G_SG16/S_ALC/C_C214/D_7161 = 'EAB') then ('1') else ('0'))"/>
 
 			<!-- Sum of all the Taxable AMount basis excluding Payement Discount - MOA+04G -->
 			<let name="sumtaxBasisAmountExclPD_3" value="number(sum($inv/G_SG52[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '04G']/C_C516/D_5004))"/>		
 			<!-- Percentage discount -->
-			<let name="percentageDiscountPerPromptPayment_5" value="number(if (exists($inv/G_SG19/S_PCD/C_C501/D_5482)) then ($inv/G_SG19/S_PCD/C_C501/D_5482) else ('1'))"/>
+			<let name="percentageDiscountPerPromptPayment_5" value="number(if (exists($inv/G_SG8/S_PCD/C_C501/D_5482)) then ($inv/G_SG8/S_PCD/C_C501/D_5482) else ('1'))"/>
 			<!-- Expected result: Payment Discout Amount => Compared with ruleB -->
 			<let name="paymentDiscountAmount_6" value="number(.[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '52']/C_C516/D_5004)"/>
 			<!-- Result from rule F -->
