@@ -1,0 +1,1169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeList>
+
+	<Category id="DTM">
+		<Code id="DTM_2005">
+			<enumeration value="1"/>    
+			<enumeration value="35"/>
+			<enumeration value="137"/>  
+			<enumeration value="263"/>
+			<enumeration value="454"/>
+		</Code>
+		<Code id="DTM_2379">
+			<enumeration value="102"/>    
+			<enumeration value="203"/>
+			<enumeration value="718"/>  
+		</Code>
+	</Category>
+
+	<Category id="SG1_RFF">
+		<Code id="SG1_RFF_1153">
+			<enumeration value="AAK"/>    
+			<enumeration value="DL"/>
+			<enumeration value="IV"/>  
+			<enumeration value="ALQ"/>    
+			<enumeration value="ACE"/>
+			<enumeration value="ON"/> 
+			<enumeration value="ALO"/>    
+			<enumeration value="CD"/>
+			<enumeration value="PQ"/> 
+		</Code>
+		<Code id="SG1_RFF_1153_Credit">
+			<enumeration value="AAK"/>    
+			<enumeration value="DL"/>
+			<enumeration value="IV"/>  
+			<enumeration value="ALQ"/>    
+			<enumeration value="ACE"/>
+			<enumeration value="ON"/> 
+			<enumeration value="ALO"/>    
+			<enumeration value="CD"/>
+			<enumeration value="PQ"/> 
+		</Code>
+		<Code id="SG1_RFF_1153_Invoic">
+			<enumeration value="AAK"/>
+			<enumeration value="IV"/>  			
+			<enumeration value="ON"/> 
+			<enumeration value="PQ"/> 
+		</Code>
+	</Category>
+
+	<Category id="SG1_DTM">
+		<Code id="SG1_DTM_2005">
+			<enumeration value="171"/>    
+		</Code>
+		<Code id="SG1_DTM_2379">
+			<enumeration value="102"/>    
+		</Code>
+	</Category>
+
+	<Category id="SG2_NAD">
+		<Code id="SG2_NAD_3035">
+			<enumeration value="AB"/>    
+			<enumeration value="BY"/>  
+			<enumeration value="DP"/>  
+			<enumeration value="II"/>  
+			<enumeration value="IV"/>  
+			<enumeration value="SR"/>  
+			<enumeration value="SU"/>  
+			<enumeration value="SF"/>
+			<enumeration value="UC"/>  
+		</Code>
+		<Code id="SG2_NAD_3055">
+			<enumeration value="9"/>    
+		</Code>
+	</Category>
+
+	<Category id="SG2_FII">
+		<Code id="SG2_FII_3035">
+			<enumeration value="RB"/>    
+		</Code>
+		<Code id="SG2_FII_1131">
+			<enumeration value="25"/>    
+		</Code>
+		<Code id="SG2_FII_3055">
+			<enumeration value="5"/>    
+		</Code>
+	</Category>
+
+	<Category id="SG3_RFF">
+		<Code id="SG3_RFF_1153">
+			<enumeration value="VA"/>
+			<enumeration value="XA"/>
+			<enumeration value="YC1"/>
+		</Code>
+	</Category>
+
+	<Category id="SG7_DTM">
+		<Code id="SG7_DTM_2005">
+			<enumeration value="134"/>
+		</Code>
+		<Code id="SG7_DTM_2379">
+			<enumeration value="102"/>    
+		</Code>
+	</Category>
+
+	<Category id="SG8_DTM">
+		<Code id="SG8_DTM_2005">
+			<enumeration value="12"/>
+			<enumeration value="13"/>
+		</Code>
+		<Code id="SG8_DTM_2379">
+			<enumeration value="102"/>    
+		</Code>
+	</Category>
+
+	<Category id="SG8_PCD">
+		<Code id="SG8_PCD_5245">
+			<enumeration value="12"/>
+			<enumeration value="15"/>
+		</Code>
+	</Category>
+
+	<Category id="SG8_MOA">
+		<Code id="SG8_MOA_5025">
+			<enumeration value="52"/>
+			<enumeration value="201"/>
+		</Code>
+	</Category>
+
+	<Category id="SG12_TOD">
+		<Code id="SG12_TOD_1131">
+			<enumeration value="3E"/>
+		</Code>
+	</Category>
+
+	<Category id="SG16_ALC">
+		<Code id="SG16_ALC_7161">
+			<enumeration value="EAB"/>
+			<enumeration value="FC"/>
+			<enumeration value="HD"/>
+			<enumeration value="DI"/>
+		</Code>
+		<Code id="SG16_ALC_3055">
+			<enumeration value="281"/>
+		</Code>
+	</Category>
+
+	<Category id="SG19_PCD">
+		<Code id="SG19_PCD_5245">
+			<enumeration value="1"/>
+			<enumeration value="2"/>
+		</Code>
+	</Category>
+
+	<Category id="SG20_MOA">
+		<Code id="SG20_MOA_5025">
+			<enumeration value="23"/>
+			<enumeration value="204"/>
+		</Code>
+	</Category>
+
+	<Category id="SG22_TAX">
+		<Code id="SG22_TAX_5279">
+			<enumeration value="FTXHD"/>
+		</Code>
+		<Code id="SG22_TAX_3055">
+			<enumeration value="281"/>
+		</Code>
+		<Code id="SG22_TAX_5305">
+			<enumeration value="AE"/>
+		</Code>
+	</Category>
+
+	<Category id="SG22_MOA">
+		<Code id="SG22_MOA_5025">
+			<enumeration value="23"/>
+			<enumeration value="52"/>
+			<enumeration value="204"/>
+		</Code>
+	</Category>
+
+	<Category id="SG26_LIN">
+		<Code id="SG26_LIN_7143">
+			<enumeration value="SRV"/>
+		</Code>
+	</Category>
+
+	<Category id="SG26_PIA">
+		<Code id="SG26_PIA_7143">
+			<enumeration value="HS"/>
+			<enumeration value="IN"/>
+			<enumeration value="SA"/>
+			<enumeration value="SUE"/>
+		</Code>
+	</Category>
+
+	<Category id="SG26_IMD">
+		<Code id="SG26_IMD_3055">
+			<enumeration value="2"/>
+			<enumeration value="9"/>
+		</Code>
+	</Category>
+
+	<Category id="SG26_DTM">
+		<Code id="SG26_DTM_2005">
+			<enumeration value="1"/>
+			<enumeration value="35"/>
+		</Code>
+		<Code id="SG26_DTM_2379">
+			<enumeration value="102"/>    
+		</Code>
+	</Category>
+
+	<Category id="SG26_FTX">
+		<Code id="SG26_FTX_4451">
+			<enumeration value="TXD"/>
+		</Code>
+	</Category>
+
+	<Category id="SG27_MOA">
+		<Code id="SG27_MOA_5025">
+			<enumeration value="203"/>
+			<enumeration value="496"/>
+		</Code>
+	</Category>
+
+	<Category id="SG29_PRI">
+		<Code id="SG29_PRI_5125">
+			<enumeration value="AAA"/>
+			<enumeration value="AAB"/>
+		</Code>
+	</Category>
+
+	<Category id="SG30_RFF">
+		<Code id="SG30_RFF_1153">
+			<enumeration value="ALO"/>
+			<enumeration value="ON"/>
+		</Code>
+	</Category>
+
+	<Category id="SG34_TAX">
+		<Code id="SG34_TAX_5279">
+			<enumeration value="FTXLN"/>
+		</Code>
+		<Code id="SG34_TAX_3055">
+			<enumeration value="281"/>
+		</Code>
+		<Code id="SG34_TAX_5305">
+			<enumeration value="AE"/>
+		</Code>
+	</Category>
+
+	<Category id="SG34_MOA">
+		<Code id="SG34_MOA_5025">
+			<enumeration value="125"/>
+		</Code>
+	</Category>
+
+	<Category id="SG39_ALC">
+		<Code id="SG39_ALC_7161">
+			<enumeration value="DI"/>
+		</Code>
+		<Code id="SG39_ALC_3055">
+			<enumeration value="281"/>
+		</Code>
+	</Category>
+
+	<Category id="SG41_PCD">
+		<Code id="SG41_PCD_5245">
+			<enumeration value="1"/>
+			<enumeration value="2"/>
+		</Code>
+	</Category>
+
+	<Category id="SG42_MOA">
+		<Code id="SG42_MOA_5025">
+			<enumeration value="23"/>
+			<enumeration value="204"/>
+		</Code>
+	</Category>
+
+	<Category id="SG44_TAX">
+		<Code id="SG44_TAX_5279">
+			<enumeration value="FTXLN"/>
+		</Code>
+		<Code id="SG44_TAX_3055">
+			<enumeration value="281"/>
+		</Code>
+		<Code id="SG44_TAX_5305">
+			<enumeration value="AE"/>
+		</Code>
+	</Category>
+
+	<Category id="SG44_MOA">
+		<Code id="SG44_MOA_5025">
+			<enumeration value="23"/>
+			<enumeration value="204"/>
+		</Code>
+	</Category>
+
+	<Category id="SG50_MOA">
+		<Code id="SG50_MOA_5025">
+			<enumeration value="9"/>
+			<enumeration value="77"/>
+			<enumeration value="79"/>
+			<enumeration value="113"/>
+			<enumeration value="129"/>
+			<enumeration value="150"/>
+			<enumeration value="496"/>
+		</Code>
+	</Category>
+
+	<Category id="SG51_RFF">
+		<Code id="SG51_RFF_1153">
+			<enumeration value="PQ"/>
+		</Code>
+	</Category>
+
+	<Category id="SG51_DTM">
+		<Code id="SG51_DTM_2005">
+			<enumeration value="171"/>
+		</Code>
+		<Code id="SG51_DTM_2379">
+			<enumeration value="102"/>    
+		</Code>
+	</Category>
+
+	
+	<Category id="SG52_TAX">
+		<Code id="SG52_TAX_5279">
+			<enumeration value="FTXHD"/>
+			<enumeration value="FTXLN"/>
+		</Code>
+		<Code id="SG52_TAX_3055">
+			<enumeration value="281"/>
+		</Code>
+		<Code id="SG52_TAX_5305">
+			<enumeration value="E"/>
+			<enumeration value="AE"/>
+		</Code>
+	</Category>
+
+	<Category id="SG52_MOA">
+		<Code id="SG52_MOA_5025">
+			<enumeration value="124"/>
+			<enumeration value="04G"/>
+			<enumeration value="B10"/>
+		</Code>
+	</Category>
+	
+		<Category id="SG53_ALC">
+		<Code id="SG39_ALC_3055">
+			<enumeration value="281"/>
+		</Code>
+	</Category>
+
+	<Category id="SG53_MOA">
+		<Code id="SG53_MOA_5025">
+			<enumeration value="131"/>
+		</Code>
+	</Category>
+	
+	<Category id="EBL001CL">
+		<Code id="EBL001CL">
+			<enumeration value="FTXLN"/>
+			<enumeration value="FTXHD"/>
+			<enumeration value="BF01"/>
+			<enumeration value="BF02"/>
+			<enumeration value="BF03"/>
+			<enumeration value="BF04"/>
+			<enumeration value="BF05"/>
+			<enumeration value="BF06"/>
+			<enumeration value="BF07"/>
+			<enumeration value="BF08"/>
+			<enumeration value="BF09"/>
+			<enumeration value="BF10"/>
+			<enumeration value="BF11"/>
+			<enumeration value="BF12"/>
+			<enumeration value="BF13"/>
+			<enumeration value="BF14"/>
+			<enumeration value="BF15"/>
+			<enumeration value="BF16"/>
+			<enumeration value="BF17"/>
+			<enumeration value="BF18"/>
+			<enumeration value="BF19"/>
+			<enumeration value="BF20"/>
+			<enumeration value="BF21"/>
+			<enumeration value="BF22"/>
+			<enumeration value="BF23"/>
+			<enumeration value="BF24"/>
+			<enumeration value="BF25"/>
+			<enumeration value="BF26"/>
+			<enumeration value="BF27"/>
+			<enumeration value="BF28"/>
+			<enumeration value="BF29"/>
+			<enumeration value="BF30"/>
+			<enumeration value="BF31"/>
+			<enumeration value="BF32"/>
+			<enumeration value="BF33"/>
+			<enumeration value="BF34"/>
+			<enumeration value="BF35"/>
+			<enumeration value="BF36"/>
+			<enumeration value="BF37"/>
+			<enumeration value="BF38"/>
+			<enumeration value="BF39"/>
+			<enumeration value="BF40"/>
+			<enumeration value="BF41"/>
+			<enumeration value="BF42"/>
+			<enumeration value="BF43"/>
+			<enumeration value="BF43bis"/>
+			<enumeration value="BF44"/>
+			<enumeration value="BF45"/>
+			<enumeration value="BF45bis"/>
+			<enumeration value="BF46"/>
+			<enumeration value="BF47"/>
+			<enumeration value="BF48"/>
+			<enumeration value="BF49"/>
+			<enumeration value="BF50"/>
+			<enumeration value="BF51"/>
+			<enumeration value="BF52"/>
+			<enumeration value="BF52bis"/>
+			<enumeration value="BF53"/>
+			<enumeration value="BF54"/>
+			<enumeration value="BF55"/>
+			<enumeration value="BF56"/>
+			<enumeration value="BF57"/>
+			<enumeration value="BF58"/>
+			<enumeration value="BF59"/>
+			<enumeration value="BF60"/>
+			<enumeration value="BF61"/>
+			<enumeration value="BF62"/>
+			<enumeration value="BF63"/>
+			<enumeration value="BF64"/>
+			<enumeration value="BF65"/>
+			<enumeration value="BF66"/>
+			<enumeration value="BF67"/>
+			<enumeration value="BF68"/>
+			<enumeration value="BF69"/>
+			<enumeration value="BF70"/>
+			<enumeration value="BF71"/>
+			<enumeration value="BF72"/>
+			<enumeration value="BF73"/>
+			<enumeration value="BF74"/>
+			<enumeration value="BF75"/>
+			<enumeration value="BF77"/>
+			<enumeration value="BF78"/>
+			<enumeration value="BF79"/>
+			<enumeration value="BF80"/>
+			<enumeration value="BF81"/>
+			<enumeration value="BF82"/>
+			<enumeration value="BF83"/>
+			<enumeration value="BF84"/>
+			<enumeration value="BF85"/>
+			<enumeration value="BF86"/>
+			<enumeration value="BF87"/>
+			<enumeration value="BF88"/>
+			<enumeration value="BF89"/>
+			<enumeration value="BF90"/>
+			<enumeration value="BF91"/>
+			<enumeration value="BF92"/>
+			<enumeration value="BF93"/>
+			<enumeration value="BF94"/>
+			<enumeration value="BF95"/>
+			<enumeration value="BF96"/>
+			<enumeration value="BF97"/>
+			<enumeration value="BF98"/>
+			<enumeration value="BF99"/>
+			<enumeration value="BF100"/>
+			<enumeration value="BF101"/>
+			<enumeration value="BF102"/>
+			<enumeration value="BF103"/>
+			<enumeration value="BF104"/>
+			<enumeration value="BF105"/>
+			<enumeration value="BF106"/>
+			<enumeration value="BF107"/>
+			<enumeration value="BF108"/>
+			<enumeration value="BF109"/>
+			<enumeration value="BF110"/>
+			<enumeration value="BF111"/>
+			<enumeration value="BF112"/>
+			<enumeration value="BF113"/>
+			<enumeration value="BF114"/>
+			<enumeration value="BF115"/>
+			<enumeration value="BF116"/>
+			<enumeration value="BF117"/>
+			<enumeration value="BF118"/>
+			<enumeration value="BF119"/>
+			<enumeration value="BF120"/>
+			<enumeration value="BF121"/>
+			<enumeration value="BF122"/>
+			<enumeration value="BF123"/>
+			<enumeration value="BF124"/>
+			<enumeration value="BF125"/>
+			<enumeration value="BF126"/>
+			<enumeration value="BF127"/>
+			<enumeration value="BF128"/>
+			<enumeration value="BF129"/>
+			<enumeration value="BF130"/>
+			<enumeration value="BF131"/>
+			<enumeration value="BF132"/>
+			<enumeration value="BF133"/>
+			<enumeration value="BF134"/>
+			<enumeration value="BF135"/>
+			<enumeration value="BF136"/>
+			<enumeration value="BF137"/>
+			<enumeration value="BF138"/>
+			<enumeration value="BF139"/>
+			<enumeration value="BF140"/>
+			<enumeration value="BF141"/>
+			<enumeration value="BF142"/>
+			<enumeration value="BF143"/>
+			<enumeration value="BF144"/>
+			<enumeration value="BF145"/>
+			<enumeration value="BF146"/>
+			<enumeration value="BF147"/>
+			<enumeration value="BF148"/>
+			<enumeration value="BF149"/>
+			<enumeration value="001"/>
+			<enumeration value="002"/>
+			<enumeration value="003"/>
+			<enumeration value="004"/>
+			<enumeration value="005"/>
+			<enumeration value="006"/>
+			<enumeration value="007"/>
+			<enumeration value="008"/>
+			<enumeration value="009"/>
+			<enumeration value="010"/>
+			<enumeration value="011"/>
+			<enumeration value="012"/>
+			<enumeration value="013"/>
+			<enumeration value="014"/>
+			<enumeration value="015"/>
+			<enumeration value="020"/>
+			<enumeration value="021"/>
+			<enumeration value="022"/>
+			<enumeration value="023"/>
+			<enumeration value="024"/>
+			<enumeration value="025"/>
+			<enumeration value="026"/>
+			<enumeration value="027"/>
+			<enumeration value="028"/>
+			<enumeration value="029"/>
+			<enumeration value="030"/>
+			<enumeration value="031"/>
+			<enumeration value="032"/>
+			<enumeration value="033"/>
+			<enumeration value="034"/>
+			<enumeration value="035"/>
+			<enumeration value="036"/>
+			<enumeration value="037"/>
+			<enumeration value="038"/>
+			<enumeration value="039"/>
+			<enumeration value="040"/>
+			<enumeration value="041"/>
+			<enumeration value="042"/>
+			<enumeration value="043"/>
+		</Code>
+	</Category>
+
+	<Category id="RTI">
+		<Code id="RTI_GRAI">
+			<enumeration value="8710400465119"/>
+			<enumeration value="8710400465324"/>
+			<enumeration value="8715297933000"/>
+			<enumeration value="8714303000057"/>
+			<enumeration value="8714303000019"/>
+			<enumeration value="8714303000040"/>
+			<enumeration value="8714303000026"/>
+			<enumeration value="8714303000033"/>
+			<enumeration value="8714303000002"/>
+			<enumeration value="8714303000064"/>
+			<enumeration value="0662510000606"/>
+			<enumeration value="0662510000088"/>
+			<enumeration value="0662510000064"/>
+			<enumeration value="0662510000033"/>
+			<enumeration value="0662510000019"/>
+			<enumeration value="0662510000248"/>
+			<enumeration value="0662510000309"/>
+			<enumeration value="0662510000255"/>
+			<enumeration value="0662510000316"/>
+			<enumeration value="0662510060433"/>
+			<enumeration value="0662510000163"/>
+			<enumeration value="0662510000767"/>
+			<enumeration value="0662510000774"/>
+			<enumeration value="0662510000323"/>
+			<enumeration value="0662510000330"/>
+			<enumeration value="8716132120067"/>
+			<enumeration value="8716532000518"/>
+			<enumeration value="8716532000440"/>
+			<enumeration value="8716532001317"/>
+			<enumeration value="8716532001461"/>
+			<enumeration value="8716532000303"/>
+			<enumeration value="8716532015109"/>
+			<enumeration value="8716532015116"/>
+			<enumeration value="8716532001072"/>
+			<enumeration value="8716532001065"/>
+			<enumeration value="8716532001102"/>
+			<enumeration value="8716532001096"/>
+			<enumeration value="8716532001133"/>
+			<enumeration value="8716532001140"/>
+			<enumeration value="8716532001157"/>
+			<enumeration value="8716532001119"/>
+			<enumeration value="8716532001126"/>
+			<enumeration value="8716532001003"/>
+			<enumeration value="8716532000556"/>
+			<enumeration value="8716532050322"/>
+			<enumeration value="8716532000563"/>
+			<enumeration value="8716532001416"/>
+			<enumeration value="8716532001188"/>
+			<enumeration value="8716532001171"/>
+			<enumeration value="8716532014102"/>
+			<enumeration value="8716532013105"/>
+			<enumeration value="8716532016106"/>
+			<enumeration value="8716532001454"/>
+			<enumeration value="8716532000037"/>
+			<enumeration value="5400111008127"/>
+			<enumeration value="5400111008240"/>
+			<enumeration value="5400119007993"/>
+			<enumeration value="5400111008721"/>
+			<enumeration value="5400113028857"/>
+			<enumeration value="5400113026716"/>
+			<enumeration value="8717953013750"/>
+			<enumeration value="8713543290969"/>
+			<enumeration value="8714548356001"/>
+			<enumeration value="8714548104008"/>
+			<enumeration value="8714548354007"/>
+			<enumeration value="8714548106002"/>
+			<enumeration value="8714548353000"/>
+			<enumeration value="8714548136009"/>
+			<enumeration value="8714548119002"/>
+			<enumeration value="8714548355004"/>
+			<enumeration value="8714548154003"/>
+			<enumeration value="8714548156007"/>
+			<enumeration value="8714548164002"/>
+			<enumeration value="8714548351006"/>
+			<enumeration value="8714548186004"/>
+			<enumeration value="8714548110009"/>
+			<enumeration value="8714548216008"/>
+			<enumeration value="8714548230004"/>
+			<enumeration value="8714548358005"/>
+			<enumeration value="8714548357008"/>
+			<enumeration value="8714548246005"/>
+			<enumeration value="8714548118005"/>
+			<enumeration value="8714548410000"/>
+			<enumeration value="8714548116001"/>
+			<enumeration value="8714548610004"/>
+			<enumeration value="8714548808005"/>
+			<enumeration value="8714548848001"/>
+			<enumeration value="8714548880001"/>
+			<enumeration value="8714548884009"/>
+			<enumeration value="8714548541001"/>
+			<enumeration value="8714548542008"/>
+			<enumeration value="8714548561009"/>
+			<enumeration value="8714548112003"/>
+			<enumeration value="8714548114007"/>
+			<enumeration value="8714548113000"/>
+			<enumeration value="8714548300004"/>
+			<enumeration value="8714548115004"/>
+			<enumeration value="8714548111006"/>
+			<enumeration value="8712800009337"/>
+			<enumeration value="5413995000019"/>
+			<enumeration value="4051513999998"/>
+			<enumeration value="4051513999981"/>
+			<enumeration value="4027527143108"/>
+			<enumeration value="4027527143146"/>
+			<enumeration value="4027527164103"/>
+			<enumeration value="4027527164134"/>
+			<enumeration value="4027527164165"/>
+			<enumeration value="4027527164189"/>
+			<enumeration value="4027527164202"/>
+			<enumeration value="4027527164240"/>
+			<enumeration value="4260320760022"/>
+			<enumeration value="3700395612105"/>
+			<enumeration value="3700395661004"/>
+			<enumeration value="3700395612112"/>
+			<enumeration value="3700395660809"/>
+			<enumeration value="3700395681200"/>
+			<enumeration value="8718452177431"/>
+			<enumeration value="8710548074884"/>
+			<enumeration value="3589460000029"/>
+			<enumeration value="3589460000135"/>
+			<enumeration value="3589460000012"/>
+			<enumeration value="3589460000050"/>
+			<enumeration value="3589460000074"/>
+			<enumeration value="3589460000159"/>
+			<enumeration value="3589460000128"/>
+			<enumeration value="3589460000142"/>
+			<enumeration value="8712345010812"/>
+			<enumeration value="7290101460091"/>
+			<enumeration value="8712908000014"/>
+			<enumeration value="8712908000106"/>
+			<enumeration value="8710147031004"/>
+			<enumeration value="5414497999993"/>
+			<enumeration value="5414497999894"/>
+			<enumeration value="5410000000088"/>
+			<enumeration value="5410000000071"/>
+			<enumeration value="5410000000064"/>
+			<enumeration value="5400000000096"/>
+			<enumeration value="5410000000057"/>
+			<enumeration value="5410000000101"/>
+			<enumeration value="5410000000033"/>
+			<enumeration value="5410000000040"/>
+			<enumeration value="8712345010058"/>
+			<enumeration value="8712345010034"/>
+			<enumeration value="8712345010041"/>
+			<enumeration value="8712345010065"/>
+			<enumeration value="8712345010072"/>
+			<enumeration value="8712345010010"/>
+		</Code>
+	</Category>
+	<Category id="Currency_ISO">
+		<Code id="Currency_ISO">
+			<enumeration value="ADP"/>
+			<enumeration value="AED"/>
+			<enumeration value="AFA"/>
+			<enumeration value="ALL"/>
+			<enumeration value="AMD"/>
+			<enumeration value="ANG"/>
+			<enumeration value="AOA"/>
+			<enumeration value="AOK"/>
+			<enumeration value="ARA"/>
+			<enumeration value="ARS"/>
+			<enumeration value="ATS"/>
+			<enumeration value="AUD"/>
+			<enumeration value="AWG"/>
+			<enumeration value="AZM"/>
+			<enumeration value="BAM"/>
+			<enumeration value="BBD"/>
+			<enumeration value="BDT"/>
+			<enumeration value="BEC"/>
+			<enumeration value="BEF"/>
+			<enumeration value="BEL"/>
+			<enumeration value="BGL"/>
+			<enumeration value="BGN"/>
+			<enumeration value="BHD"/>
+			<enumeration value="BIF"/>
+			<enumeration value="BMD"/>
+			<enumeration value="BND"/>
+			<enumeration value="BOB"/>
+			<enumeration value="BOV"/>
+			<enumeration value="BRC"/>
+			<enumeration value="BRL"/>
+			<enumeration value="BSD"/>
+			<enumeration value="BTN"/>
+			<enumeration value="BUK"/>
+			<enumeration value="BWP"/>
+			<enumeration value="BYB"/>
+			<enumeration value="BYR"/>
+			<enumeration value="BZD"/>
+			<enumeration value="CAD"/>
+			<enumeration value="CDF"/>
+			<enumeration value="CHF"/>
+			<enumeration value="CLF"/>
+			<enumeration value="CLP"/>
+			<enumeration value="CNY"/>
+			<enumeration value="COP"/>
+			<enumeration value="CRC"/>
+			<enumeration value="CUP"/>
+			<enumeration value="CVE"/>
+			<enumeration value="CYP"/>
+			<enumeration value="CZK"/>
+			<enumeration value="DEM"/>
+			<enumeration value="DJF"/>
+			<enumeration value="DKK"/>
+			<enumeration value="DOP"/>
+			<enumeration value="DZD"/>
+			<enumeration value="ECS"/>
+			<enumeration value="ECV"/>
+			<enumeration value="EEK"/>
+			<enumeration value="EGP"/>
+			<enumeration value="ERN"/>
+			<enumeration value="ESP"/>
+			<enumeration value="ETB"/>
+			<enumeration value="EUR"/>
+			<enumeration value="FIM"/>
+			<enumeration value="FJD"/>
+			<enumeration value="FKP"/>
+			<enumeration value="FRF"/>
+			<enumeration value="GBP"/>
+			<enumeration value="GEL"/>
+			<enumeration value="GHC"/>
+			<enumeration value="GIP"/>
+			<enumeration value="GMD"/>
+			<enumeration value="GNF"/>
+			<enumeration value="GRD"/>
+			<enumeration value="GTQ"/>
+			<enumeration value="GWP"/>
+			<enumeration value="GYD"/>
+			<enumeration value="HKD"/>
+			<enumeration value="HNL"/>
+			<enumeration value="HRD"/>
+			<enumeration value="HRK"/>
+			<enumeration value="HTG"/>
+			<enumeration value="HUF"/>
+			<enumeration value="IDR"/>
+			<enumeration value="IEP"/>
+			<enumeration value="ILS"/>
+			<enumeration value="INR"/>
+			<enumeration value="IQD"/>
+			<enumeration value="IRR"/>
+			<enumeration value="ISK"/>
+			<enumeration value="ITL"/>
+			<enumeration value="JMD"/>
+			<enumeration value="JOD"/>
+			<enumeration value="JPY"/>
+			<enumeration value="KES"/>
+			<enumeration value="KGS"/>
+			<enumeration value="KHR"/>
+			<enumeration value="KMF"/>
+			<enumeration value="KPW"/>
+			<enumeration value="KRW"/>
+			<enumeration value="KWD"/>
+			<enumeration value="KYD"/>
+			<enumeration value="KZT"/>
+			<enumeration value="LAK"/>
+			<enumeration value="LBP"/>
+			<enumeration value="LKR"/>
+			<enumeration value="LRD"/>
+			<enumeration value="LSL"/>
+			<enumeration value="LTL"/>
+			<enumeration value="LUC"/>
+			<enumeration value="LUF"/>
+			<enumeration value="LUL"/>
+			<enumeration value="LVL"/>
+			<enumeration value="LYD"/>
+			<enumeration value="MAD"/>
+			<enumeration value="MDL"/>
+			<enumeration value="MGF"/>
+			<enumeration value="MKD"/>
+			<enumeration value="MNT"/>
+			<enumeration value="MOP"/>
+			<enumeration value="MRO"/>
+			<enumeration value="MTL"/>
+			<enumeration value="MUR"/>
+			<enumeration value="MVR"/>
+			<enumeration value="MWK"/>
+			<enumeration value="MXN"/>
+			<enumeration value="MXV"/>
+			<enumeration value="MYR"/>
+			<enumeration value="MZM"/>
+			<enumeration value="NAD"/>
+			<enumeration value="NGN"/>
+			<enumeration value="NIC"/>
+			<enumeration value="NIO"/>
+			<enumeration value="NLG"/>
+			<enumeration value="NOK"/>
+			<enumeration value="NPR"/>
+			<enumeration value="NZD"/>
+			<enumeration value="OMR"/>
+			<enumeration value="PAB"/>
+			<enumeration value="PEI"/>
+			<enumeration value="PEN"/>
+			<enumeration value="PGK"/>
+			<enumeration value="PHP"/>
+			<enumeration value="PKR"/>
+			<enumeration value="PLN"/>
+			<enumeration value="PTE"/>
+			<enumeration value="PYG"/>
+			<enumeration value="QAR"/>
+			<enumeration value="ROL"/>
+			<enumeration value="RUB"/>
+			<enumeration value="RWF"/>
+			<enumeration value="SAR"/>
+			<enumeration value="SBD"/>
+			<enumeration value="SCR"/>
+			<enumeration value="SDD"/>
+			<enumeration value="SEK"/>
+			<enumeration value="SGD"/>
+			<enumeration value="SHP"/>
+			<enumeration value="SIT"/>
+			<enumeration value="SKK"/>
+			<enumeration value="SLL"/>
+			<enumeration value="SOS"/>
+			<enumeration value="SRG"/>
+			<enumeration value="STD"/>
+			<enumeration value="SVC"/>
+			<enumeration value="SYP"/>
+			<enumeration value="SZL"/>
+			<enumeration value="THB"/>
+			<enumeration value="TJR"/>
+			<enumeration value="TMM"/>
+			<enumeration value="TND"/>
+			<enumeration value="TOP"/>
+			<enumeration value="TPE"/>
+			<enumeration value="TRL"/>
+			<enumeration value="TTD"/>
+			<enumeration value="TWD"/>
+			<enumeration value="TZS"/>
+			<enumeration value="UAH"/>
+			<enumeration value="UGX"/>
+			<enumeration value="USD"/>
+			<enumeration value="USN"/>
+			<enumeration value="USS"/>
+			<enumeration value="UYU"/>
+			<enumeration value="UZS"/>
+			<enumeration value="VEB"/>
+			<enumeration value="VND"/>
+			<enumeration value="VUV"/>
+			<enumeration value="WST"/>
+			<enumeration value="XAF"/>
+			<enumeration value="XAG"/>
+			<enumeration value="XAU"/>
+			<enumeration value="XBA"/>
+			<enumeration value="XBB"/>
+			<enumeration value="XBC"/>
+			<enumeration value="XBD"/>
+			<enumeration value="XCD"/>
+			<enumeration value="XDR"/>
+			<enumeration value="XEU"/>
+			<enumeration value="XFO"/>
+			<enumeration value="XFU"/>
+			<enumeration value="XOF"/>
+			<enumeration value="XPD"/>
+			<enumeration value="XPF"/>
+			<enumeration value="XTS"/>
+			<enumeration value="XXX"/>
+			<enumeration value="YDD"/>
+			<enumeration value="YER"/>
+			<enumeration value="YUM"/>
+			<enumeration value="YUN"/>
+			<enumeration value="ZAR"/>
+			<enumeration value="ZMK"/>
+			<enumeration value="ZWD"/>
+		</Code>
+	</Category>
+
+	<Category id="Country_ISO">
+		<Code id="Country_ISO">
+			<enumeration value="AD"/>
+			<enumeration value="AE"/>
+			<enumeration value="AF"/>
+			<enumeration value="AG"/>
+			<enumeration value="AI"/>
+			<enumeration value="AL"/>
+			<enumeration value="AM"/>
+			<enumeration value="AN"/>
+			<enumeration value="AO"/>
+			<enumeration value="AQ"/>
+			<enumeration value="AR"/>
+			<enumeration value="AS"/>
+			<enumeration value="AT"/>
+			<enumeration value="AU"/>
+			<enumeration value="AW"/>
+			<enumeration value="AZ"/>
+			<enumeration value="BA"/>
+			<enumeration value="BB"/>
+			<enumeration value="BD"/>
+			<enumeration value="BE"/>
+			<enumeration value="BF"/>
+			<enumeration value="BG"/>
+			<enumeration value="BH"/>
+			<enumeration value="BI"/>
+			<enumeration value="BJ"/>
+			<enumeration value="BM"/>
+			<enumeration value="BN"/>
+			<enumeration value="BO"/>
+			<enumeration value="BR"/>
+			<enumeration value="BS"/>
+			<enumeration value="BT"/>
+			<enumeration value="BV"/>
+			<enumeration value="BW"/>
+			<enumeration value="BY"/>
+			<enumeration value="BZ"/>
+			<enumeration value="CA"/>
+			<enumeration value="CC"/>
+			<enumeration value="CD"/>
+			<enumeration value="CF"/>
+			<enumeration value="CG"/>
+			<enumeration value="CH"/>
+			<enumeration value="CI"/>
+			<enumeration value="CK"/>
+			<enumeration value="CL"/>
+			<enumeration value="CM"/>
+			<enumeration value="CN"/>
+			<enumeration value="CO"/>
+			<enumeration value="CR"/>
+			<enumeration value="CU"/>
+			<enumeration value="CV"/>
+			<enumeration value="CX"/>
+			<enumeration value="CY"/>
+			<enumeration value="CZ"/>
+			<enumeration value="DE"/>
+			<enumeration value="DJ"/>
+			<enumeration value="DK"/>
+			<enumeration value="DM"/>
+			<enumeration value="DO"/>
+			<enumeration value="DZ"/>
+			<enumeration value="EC"/>
+			<enumeration value="EE"/>
+			<enumeration value="EG"/>
+			<enumeration value="EH"/>
+			<enumeration value="ER"/>
+			<enumeration value="ES"/>
+			<enumeration value="ET"/>
+			<enumeration value="FI"/>
+			<enumeration value="FJ"/>
+			<enumeration value="FK"/>
+			<enumeration value="FM"/>
+			<enumeration value="FO"/>
+			<enumeration value="FR"/>
+			<enumeration value="GA"/>
+			<enumeration value="GB"/>
+			<enumeration value="GD"/>
+			<enumeration value="GE"/>
+			<enumeration value="GF"/>
+			<enumeration value="GH"/>
+			<enumeration value="GI"/>
+			<enumeration value="GL"/>
+			<enumeration value="GM"/>
+			<enumeration value="GN"/>
+			<enumeration value="GP"/>
+			<enumeration value="GQ"/>
+			<enumeration value="GR"/>
+			<enumeration value="GS"/>
+			<enumeration value="GT"/>
+			<enumeration value="GU"/>
+			<enumeration value="GW"/>
+			<enumeration value="GY"/>
+			<enumeration value="HK"/>
+			<enumeration value="HM"/>
+			<enumeration value="HN"/>
+			<enumeration value="HR"/>
+			<enumeration value="HT"/>
+			<enumeration value="HU"/>
+			<enumeration value="ID"/>
+			<enumeration value="IE"/>
+			<enumeration value="IL"/>
+			<enumeration value="IN"/>
+			<enumeration value="IO"/>
+			<enumeration value="IQ"/>
+			<enumeration value="IR"/>
+			<enumeration value="IS"/>
+			<enumeration value="IT"/>
+			<enumeration value="JM"/>
+			<enumeration value="JO"/>
+			<enumeration value="JP"/>
+			<enumeration value="KE"/>
+			<enumeration value="KG"/>
+			<enumeration value="KH"/>
+			<enumeration value="KI"/>
+			<enumeration value="KM"/>
+			<enumeration value="KN"/>
+			<enumeration value="KP"/>
+			<enumeration value="KR"/>
+			<enumeration value="KW"/>
+			<enumeration value="KY"/>
+			<enumeration value="KZ"/>
+			<enumeration value="LA"/>
+			<enumeration value="LB"/>
+			<enumeration value="LC"/>
+			<enumeration value="LI"/>
+			<enumeration value="LK"/>
+			<enumeration value="LR"/>
+			<enumeration value="LS"/>
+			<enumeration value="LT"/>
+			<enumeration value="LU"/>
+			<enumeration value="LV"/>
+			<enumeration value="LY"/>
+			<enumeration value="MA"/>
+			<enumeration value="MC"/>
+			<enumeration value="MD"/>
+			<enumeration value="MG"/>
+			<enumeration value="MH"/>
+			<enumeration value="MK"/>
+			<enumeration value="ML"/>
+			<enumeration value="MM"/>
+			<enumeration value="MN"/>
+			<enumeration value="MO"/>
+			<enumeration value="MP"/>
+			<enumeration value="MQ"/>
+			<enumeration value="MR"/>
+			<enumeration value="MS"/>
+			<enumeration value="MT"/>
+			<enumeration value="MU"/>
+			<enumeration value="MV"/>
+			<enumeration value="MW"/>
+			<enumeration value="MX"/>
+			<enumeration value="MY"/>
+			<enumeration value="MZ"/>
+			<enumeration value="NA"/>
+			<enumeration value="NC"/>
+			<enumeration value="NE"/>
+			<enumeration value="NF"/>
+			<enumeration value="NG"/>
+			<enumeration value="NI"/>
+			<enumeration value="NL"/>
+			<enumeration value="NO"/>
+			<enumeration value="NP"/>
+			<enumeration value="NR"/>
+			<enumeration value="NU"/>
+			<enumeration value="NZ"/>
+			<enumeration value="OM"/>
+			<enumeration value="PA"/>
+			<enumeration value="PE"/>
+			<enumeration value="PF"/>
+			<enumeration value="PG"/>
+			<enumeration value="PH"/>
+			<enumeration value="PK"/>
+			<enumeration value="PL"/>
+			<enumeration value="PM"/>
+			<enumeration value="PN"/>
+			<enumeration value="PR"/>
+			<enumeration value="PS"/>
+			<enumeration value="PT"/>
+			<enumeration value="PW"/>
+			<enumeration value="PY"/>
+			<enumeration value="QA"/>
+			<enumeration value="RE"/>
+			<enumeration value="RO"/>
+			<enumeration value="RU"/>
+			<enumeration value="RW"/>
+			<enumeration value="SA"/>
+			<enumeration value="SB"/>
+			<enumeration value="SC"/>
+			<enumeration value="SD"/>
+			<enumeration value="SE"/>
+			<enumeration value="SG"/>
+			<enumeration value="SH"/>
+			<enumeration value="SI"/>
+			<enumeration value="SJ"/>
+			<enumeration value="SK"/>
+			<enumeration value="SL"/>
+			<enumeration value="SM"/>
+			<enumeration value="SN"/>
+			<enumeration value="SO"/>
+			<enumeration value="SR"/>
+			<enumeration value="ST"/>
+			<enumeration value="SV"/>
+			<enumeration value="SY"/>
+			<enumeration value="SZ"/>
+			<enumeration value="TC"/>
+			<enumeration value="TD"/>
+			<enumeration value="TF"/>
+			<enumeration value="TG"/>
+			<enumeration value="TH"/>
+			<enumeration value="TJ"/>
+			<enumeration value="TK"/>
+			<enumeration value="TM"/>
+			<enumeration value="TN"/>
+			<enumeration value="TO"/>
+			<enumeration value="TP"/>
+			<enumeration value="TR"/>
+			<enumeration value="TT"/>
+			<enumeration value="TV"/>
+			<enumeration value="TW"/>
+			<enumeration value="TZ"/>
+			<enumeration value="UA"/>
+			<enumeration value="UG"/>
+			<enumeration value="UM"/>
+			<enumeration value="US"/>
+			<enumeration value="UY"/>
+			<enumeration value="UZ"/>
+			<enumeration value="VA"/>
+			<enumeration value="VC"/>
+			<enumeration value="VE"/>
+			<enumeration value="VG"/>
+			<enumeration value="VI"/>
+			<enumeration value="VN"/>
+			<enumeration value="VU"/>
+			<enumeration value="WF"/>
+			<enumeration value="WS"/>
+			<enumeration value="YE"/>
+			<enumeration value="YT"/>
+			<enumeration value="YU"/>
+			<enumeration value="ZA"/>
+			<enumeration value="ZM"/>
+			<enumeration value="ZW"/>
+		</Code>
+	</Category>
+</CodeList>
