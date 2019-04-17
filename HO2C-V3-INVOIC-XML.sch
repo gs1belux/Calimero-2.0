@@ -5,7 +5,7 @@
 	<ns uri="functions:1.0" prefix="f"/>
 
 	<!-- Reference documents and variables -->
-	<let name="codelist" value="doc(&apos;sub/HO2C - V2 - INVOIC - XML - CodeList.xml&apos;)"/>
+	<let name="codelist" value="doc(&apos;sub/HO2C-V3-INVOIC-XML-CodeList.xml&apos;)"/>
 	<let name="allSegment" value="//*[starts-with(name(), 'S_') or starts-with(name(), 'G_')]"/>
 
 	<let name="emptyGLN" value="'0000000000000'"/>
