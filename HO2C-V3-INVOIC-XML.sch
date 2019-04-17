@@ -1780,7 +1780,7 @@
 			<let name="codeValue" value="."/>
 			<assert test="$codelist//Code[@id = 'SG52_MOA_5025']/enumeration[@value = $codeValue]">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG52/MOA/C516/5025]: The value '<value-of select="$codeValue"/>' for SG52/MOA with
-        qualifier ('5025') is not correct. The value should be '23' or '204'.</assert>
+        qualifier ('5025') is not correct. The value should be '124' or '04G' or 'B10'.</assert>
 		</rule>
 	</pattern>
 	<!-- Ignored segment in this context --> 
