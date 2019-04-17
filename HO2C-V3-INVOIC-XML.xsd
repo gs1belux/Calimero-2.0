@@ -2509,6 +2509,7 @@
 			<xs:enumeration value="204"/>
 			<xs:enumeration value="496"/>
 			<xs:enumeration value="04G"/>
+			<xs:enumeration value="10B"/>
 			<xs:minLength value="1"/>
 			<xs:maxLength value="3"/>
 		</xs:restriction>
