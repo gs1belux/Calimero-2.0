@@ -24,7 +24,7 @@
 	<!--<let name="isHierarchicalDescription" value="/INTERCHANGE/M_INVOIC/G_SG10/S_CPS[D_7164 = 1]/D_7075 = '4'"/>-->
 
 
-	<title>Schema for HO2C - V2 - INVOIC - XML; 2002; EAN</title>
+	<title>Schema for HO2C-V3-INVOIC-XML; 2002; EAN</title>
 
 	<!-- UNB -->
 	<pattern>
