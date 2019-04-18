@@ -101,9 +101,33 @@
 		</rule>
 	</pattern>
 
-	<!-- Rule C - Not valid anymore 
-	The MOA+B10 isnt used actually, maybe come back in V3
-	-->
+	<!-- Rule C test -->
+	<pattern>
+		<!-- This rule is checking content and calculation on the MOA+B10 segment (VAT calculation and allowance for short term payment) -->
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG16/G_SG22[S_ALC/C_C214/D_7161 = 'EAB']">
+			<let name="actualSegment" value="./S_TAX[last()]"/>
+			<let name="taxRate" value="number(./S_TAX/C_C243/D_5278)"/>
+			
+			<!-- Sum of all the Taxable AMount basis excluding Payement Discount - MOA+04G -->
+			<let name="sumtaxBasisAmountExclPD_3" value="number(sum($inv/G_SG52[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '04G']/C_C516/D_5004))"/>	
+			<!-- Sum of all the Taxable AMount basis including Payement Discount - MOA+B10 -->
+			<let name="sumtaxBasisAmountInclPD_3" value="number(sum($inv/G_SG52[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = 'B10']/C_C516/D_5004))"/>			
+			<!-- Percentage discount -->
+			<let name="percentageDiscountPerPromptPayment_5" value="number(if (exists($inv/G_SG8/S_PCD/C_C501/D_5482)) then ($inv/G_SG8/S_PCD/C_C501/D_5482) else ('1'))"/>
+			<!-- Expected result: Payment Discout Amount => Compared with ruleB -->
+			<let name="paymentDiscountAmount_6" value="number($inv/G_SG22[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '52']/C_C516/D_5004)"/>
+			<!-- Result from rule C -->
+			<let name="ruleC" value="number($sumtaxBasisAmountExclPD_3 - $paymentDiscountAmount_6)"/>
+
+			<!-- Rule C - Check that resultE = taxBasisAmountExclude but the MOA+04G must exist -->
+			<report test="($ruleC != $sumtaxBasisAmountInclPD_3)">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
+			[UNS] - RULE C error: (#87 MOA+B10) = (#87 MOA+04G) - (#37 MOA+52). \n
+			Actual value for MOA+B10: <value-of select="$sumtaxBasisAmountInclPD_3"/> != <value-of select="$sumtaxBasisAmountExclPD_3"/> - <value-of select="$paymentDiscountAmount_6"/>. \n
+			Expected value for MOA+B10:  <value-of select="$ruleC"/>
+			</report> 
+		</rule>
+	</pattern>	
 
 	<!-- Rule D test --> 
 	<pattern>
