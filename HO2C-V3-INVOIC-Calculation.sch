@@ -13,7 +13,7 @@
 	<!-- Percentage discount for prompt Payment -->
 
 
-	<title>Schema for HO2C - V2 - INVOIC - Calculation; 2002; EAN</title>
+	<title>Schema for HO2C-V3-INVOIC-Calculation; 2002; EAN</title>
 
 
 	<!-- Rule F test -->
@@ -104,7 +104,7 @@
 	<!-- Rule C test -->
 	<pattern>
 		<!-- This rule is checking content and calculation on the MOA+B10 segment (VAT calculation and allowance for short term payment) -->
-		<rule context="/INTERCHANGE/M_INVOIC/G_SG16/G_SG22[S_ALC/C_C214/D_7161 = 'EAB']">
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG52[S_MOA/C_C516/D_5025 = 'B10']">
 			<let name="actualSegment" value="./S_TAX[last()]"/>
 			<let name="taxRate" value="number(./S_TAX/C_C243/D_5278)"/>
 			
@@ -115,7 +115,7 @@
 			<!-- Percentage discount -->
 			<let name="percentageDiscountPerPromptPayment_5" value="number(if (exists($inv/G_SG8/S_PCD/C_C501/D_5482)) then ($inv/G_SG8/S_PCD/C_C501/D_5482) else ('1'))"/>
 			<!-- Expected result: Payment Discout Amount => Compared with ruleB -->
-			<let name="paymentDiscountAmount_6" value="number($inv/G_SG22[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '52']/C_C516/D_5004)"/>
+			<let name="paymentDiscountAmount_6" value="number($inv/G_SG16/G_SG22[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '52']/C_C516/D_5004)"/>
 			<!-- Result from rule C -->
 			<let name="ruleC" value="number($sumtaxBasisAmountExclPD_3 - $paymentDiscountAmount_6)"/>
 
