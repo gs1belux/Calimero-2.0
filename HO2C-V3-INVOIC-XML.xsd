@@ -33,6 +33,14 @@
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>
+										<xs:element name="G_SG5" minOccurs="0" maxOccurs="99">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="S_CTA" type="S_CTA" maxOccurs="1"/>
+													<xs:element name="S_COM" type="S_COM" maxOccurs="5"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -4184,6 +4192,16 @@
 			<xs:element name="C_C002" type="C_C002"/>
 			<xs:element name="C_C106" type="C_C106"/>
 			<xs:element name="D_1225" type="D_1225"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="S_COM">
+		<xs:sequence>
+			<xs:element name="C_C076" type="C_C076" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="S_CTA">
+		<xs:sequence>
+			<xs:element name="D_3139" type="D_3139" minOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="S_CUX">
