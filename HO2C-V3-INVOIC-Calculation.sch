@@ -12,14 +12,13 @@
 
 	<!-- Percentage discount for prompt Payment -->
 
-
 	<title>Schema for HO2C-V3-INVOIC-Calculation; 2002; EAN</title>
-
 
 	<!-- Rule F test -->
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG26[S_MOA/C_C516/D_5025 = '125']">
 			<let name="actualSegment" value="./S_LIN"/>
+			
 			<!-- Get the quantity invoiced or the returned quantity -->
 			<let name="invoicedQuantity_10" value="number(./S_QTY[C_C186/D_6063 = '47' or C_C186/D_6063 = '61']/C_C186/D_6060)"/>
 			<!-- Multiply factor for the Price-->
@@ -60,7 +59,7 @@
 			<let name="globalAllowanceAmount_7" value="number(if (exists($inv/G_SG16/G_SG22[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '204']/C_C516/D_5004)) then (sum($inv/G_SG16/G_SG22[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '204']/C_C516/D_5004)) else ('0'))"/>
 			<!-- Expected result: Taxable basis amount excluding payment discount => Compared with ruleE -->
 			<let name="taxBasisAmountExclPD_3" value="number(.[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '04G']/C_C516/D_5004)"/>
-			<!-- Result from rule F -->
+			<!-- Result from rule E -->
 			<let name="ruleE" value="number($sumLineTaxableAmount_12 + $globalChargeAmount_8 - $globalAllowanceAmount_7)"/>
 
 			<!-- Check that resultE = taxBasisAmountExclude but the MOA+04G must exist -->
@@ -80,15 +79,14 @@
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG16/G_SG22[S_MOA/C_C516/D_5025 = '52']">
 			<let name="actualSegment" value="./S_TAX[last()]"/>
 			<let name="taxRate" value="number(./S_TAX/C_C243/D_5278)"/>
-			<let name="isEAB" value="number(if (/INTERCHANGE/M_INVOIC/G_SG16/S_ALC/C_C214/D_7161 = 'EAB') then ('1') else ('0'))"/>
 
 			<!-- Sum of all the Taxable AMount basis excluding Payement Discount - MOA+04G -->
 			<let name="sumtaxBasisAmountExclPD_3" value="number(sum($inv/G_SG52[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '04G']/C_C516/D_5004))"/>		
 			<!-- Percentage discount -->
 			<let name="percentageDiscountPerPromptPayment_5" value="number(if (exists($inv/G_SG8/S_PCD/C_C501/D_5482)) then ($inv/G_SG8/S_PCD/C_C501/D_5482) else ('1'))"/>
-			<!-- Expected result: Payment Discout Amount => Compared with ruleB -->
+			<!-- Expected result: Payment Discount Amount => Compared with ruleB -->
 			<let name="paymentDiscountAmount_6" value="number(.[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '52']/C_C516/D_5004)"/>
-			<!-- Result from rule F -->
+			<!-- Result from rule B -->
 			<let name="ruleB" value="number($sumtaxBasisAmountExclPD_3 * $percentageDiscountPerPromptPayment_5 * 0.01)"/>
 
 			<!-- Rule B - Check that resultE = taxBasisAmountExclude but the MOA+04G must exist -->
@@ -112,9 +110,7 @@
 			<let name="sumtaxBasisAmountExclPD_3" value="number(sum($inv/G_SG52[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '04G']/C_C516/D_5004))"/>	
 			<!-- Sum of all the Taxable AMount basis including Payement Discount - MOA+B10 -->
 			<let name="sumtaxBasisAmountInclPD_3" value="number(sum($inv/G_SG52[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = 'B10']/C_C516/D_5004))"/>			
-			<!-- Percentage discount -->
-			<let name="percentageDiscountPerPromptPayment_5" value="number(if (exists($inv/G_SG8/S_PCD/C_C501/D_5482)) then ($inv/G_SG8/S_PCD/C_C501/D_5482) else ('1'))"/>
-			<!-- Expected result: Payment Discout Amount => Compared with ruleB -->
+			<!-- Expected result: Payment Discount Amount => Compared with ruleB -->
 			<let name="paymentDiscountAmount_6" value="number($inv/G_SG16/G_SG22[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '52']/C_C516/D_5004)"/>
 			<!-- Result from rule C -->
 			<let name="ruleC" value="number($sumtaxBasisAmountExclPD_3 - $paymentDiscountAmount_6)"/>
@@ -137,13 +133,12 @@
 
 			<!-- Sum of all the Taxable AMount basis excluding Payement Discount - MOA+04G -->
 			<let name="sumtaxBasisAmountExclPD_3" value="number(sum($inv/G_SG52[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '04G']/C_C516/D_5004))"/>		
-			<!-- Payment Discout Amount -->
+			<!-- Payment Discount Amount -->
 			<let name="paymentDiscountAmount_6" value="number(sum($inv/G_SG16/G_SG22[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '52']/C_C516/D_5004))"/>
-			<!-- Expected result: Payment Discout Amount => Compared with ruleB -->
+			<!-- Expected result: VAT amount per VAT -->
 			<let name="totalVatAmount_1" value="number(.[S_TAX/C_C243/D_5278 = $taxRate]/S_MOA[C_C516/D_5025 = '124']/C_C516/D_5004)"/>
-			<!-- Result from rule F -->
+			<!-- Result from rule D -->
 			<let name="ruleD" value="number(($sumtaxBasisAmountExclPD_3 - $paymentDiscountAmount_6) * $taxRate * 0.01)"/>
-
 
 			<!-- Rule B - Check that resultE = taxBasisAmountExclude but the MOA+04G must exist -->
 			<report test="(format-number($ruleD,'0.00') != format-number($totalVatAmount_1,'0.00')) and string($taxRate) != 'NaN'">
@@ -162,11 +157,10 @@
 
 			<!-- Sum of all the Taxable AMount basis excluding Payement Discount - MOA+04G -->
 			<let name="sumTotalVatAmount_1" value="number(sum($inv/G_SG52/S_MOA[C_C516/D_5025 = '124']/C_C516/D_5004))"/>		
-			<!-- Expected result: Payment Discout Amount => Compared with ruleB -->
+			<!-- Expected result: Payment Discount Amount => Compared with ruleB -->
 			<let name="invoiceVatAmount_2" value="number(./S_MOA[C_C516/D_5025 = '150']/C_C516/D_5004)"/>
-			<!-- Result from rule F -->
+			<!-- Result from rule A -->
 			<let name="ruleA" value="$sumTotalVatAmount_1"/>
-
 
 			<!-- Rule A - Check that resultA = sum Total Vat Amount -->
 			<report test="($ruleA != $invoiceVatAmount_2)">
@@ -189,7 +183,7 @@
 			<let name="invoiceVatAmount_2" value="number(./G_SG50/S_MOA[C_C516/D_5025 = '150']/C_C516/D_5004)"/>	
 			<!-- Expected result: Total Invoiced Amount -->
 			<let name="totalInvoicAmount_17" value="number(./G_SG50/S_MOA[C_C516/D_5025 = '77']/C_C516/D_5004)"/>
-			<!-- Result from rule F -->
+			<!-- Result from rule I -->
 			<let name="ruleI" value="round(number($totalTaxableAmount_27 + $invoiceVatAmount_2) * 10000 ) div 10000"/>
 
 			<!-- Rule I - Check that ruleI = invoiceVatAmount_2 + totalTaxableAmount_27 -->
@@ -213,10 +207,10 @@
 			<let name="prepaidAmount_18" value="number(./G_SG50/S_MOA[C_C516/D_5025 = '113']/C_C516/D_5004)"/>	
 			<!-- Expected result: Amount to be Paid -->
 			<let name="amountToBePaid_19" value="number(./G_SG50/S_MOA[C_C516/D_5025 = '9']/C_C516/D_5004)"/>
-			<!-- Result from rule F -->
+			<!-- Result from rule J -->
 			<let name="ruleJ" value="number($totalInvoicAmount_17 - $prepaidAmount_18)"/>
 
-			<!-- Rule I - Check that ruleI = totalInvoicAmount_17 - prepaidAmount_18 -->
+			<!-- Rule J - Check that ruleI = totalInvoicAmount_17 - prepaidAmount_18 -->
 			<report test="($ruleJ != $amountToBePaid_19)">
 			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
 			[UNS] - RULE J error: #83 MOA+9 = (#83 MOA+77) - (#83 MOA+113). \n
@@ -243,7 +237,7 @@
 			<let name="ruleG_a" value="number($quantityDepositUnit_24a * $depositNetPrice_16)"/>
 			<let name="ruleG_b" value="number($quantityDepositUnit_24b * $depositNetPrice_16)"/>
 
-			<!-- Rule G - RTI return check on Line Level -->
+			<!-- Rule G - RTI charge check on Line Level -->
 			<report test="($ruleG_a != $totalReturnablePackageDepositAmount_26) and exists(./S_QTY[C_C186/D_6063 = '47']/C_C186/D_6060)">
 			{<value-of select="f:getEdifactPosition($actualSegment)"/>} 
 			[UNS] - RULE G error: #54 MOA+496 = (#54 PRI+AAA) * (#43 QTY+47). \n
@@ -288,8 +282,10 @@
 		</rule>
 	</pattern>
 
-	<!-- Rule K test --> 
-	<!-- Apply this rule only if there is no free goods -->
+	<!-- Rule K / L / M test --> 
+	<!-- Apply this rule only if there is no correcting document -->
+	<!-- Rule K' has been incorporated in rule K -->
+	<!-- Rule M has been incorporated in rule L -->
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG26[not(S_QTY/C_C186/D_6063 = '61')]">
 			<let name="actualSegment" value="./S_LIN[last()]"/>
@@ -323,7 +319,7 @@
 			<!-- Rule K - check when MEA present -->
 			<report test="($ruleK != $invoicedQuantity_10 and exists(./S_MEA/C_C174/D_6314))">
 			{<value-of select="f:getEdifactPosition($actualSegment)"/>} 
-			[QTY] - RULE K error on LIN+<value-of select="./S_LIN/D_1082"/>: #43 QTY+47 = #43 QTY+47 * #42 MEA+ABW. \n
+			[QTY] - RULE K error on LIN+<value-of select="./S_LIN/D_1082"/>: #43 QTY+47 = #43 QTY+46 * #42 MEA+ABW. \n
 			Actual value for QTY+47: <value-of select="$invoicedQuantity_10"/> != <value-of select="$deliveredQuantity_21"/> * <value-of select="$unitOfMeasure_22"/>. \n
 			Expected value for QTY+47: <value-of select="$ruleK"/>
 			</report> 
@@ -331,48 +327,21 @@
 			<!-- Rule L -->
 			<report test="$ruleL != $invoicedQuantity_10 and string($invoicedQuantity_10) != 'NaN'  and string($deliveredQuantity_21) != 'NaN'">
 			{<value-of select="f:getEdifactPosition($actualSegment)"/>} 
-			[QTY] - RULE L error on LIN+<value-of select="./S_LIN/D_1082"/>: #43 QTY+47 = (#43 QTY+47 * #42 MEA+ABW) - #43 QTY+192 \n
+			[QTY] - RULE L error on LIN+<value-of select="./S_LIN/D_1082"/>: #43 QTY+47 = (#43 QTY+46 * #42 MEA+ABW) - #43 QTY+192 \n
 			Actual value for QTY+47: <value-of select="$invoicedQuantity_10"/> != <value-of select="$deliveredQuantity_21"/> * <value-of select="$unitOfMeasure_22"/> - <value-of select="$freeGoodsQuantity_23"/> . \n
 			Expected value for QTY+47: <value-of select="$ruleL"/>
 			</report>
 
 		</rule>
 	</pattern>
-
-	<!-- Rule L test --> 
-	<pattern>
-		<rule context="/INTERCHANGE/M_INVOIC/G_SG26[S_QTY/C_C186/D_6063 = '192']">
-			<let name="actualSegment" value="./S_LIN[last()]"/>
-
-			<!-- Delivered Quantity -->
-			<let name="deliveredQuantity_21" value="number(./S_QTY[C_C186/D_6063 = '46']/C_C186/D_6060)"/>
-			<!-- Total returnable packages deposit amount chargeable -->
-			<let name="unitOfMeasure_22" value="number(if (exists(./S_MEA/C_C174/D_6314)) then (./S_MEA/C_C174/D_6314) else ('1'))"/>
-			<!-- Free goods -->
-			<let name="freeGoodsQuantity_23" value="number(./S_QTY[C_C186/D_6063 = '192']/C_C186/D_6060)"/>
-			<!-- Invoiced quantity -->
-			<let name="invoicedQuantity_10" value="number(./S_QTY[(C_C186/D_6063 = '47' or C_C186/D_6063 = '61') and exists(C_C186/D_6411)]/C_C186/D_6060)"/>
-			<!-- Result from rule L -->
-			<let name="ruleL" value="number($deliveredQuantity_21 * $unitOfMeasure_22) - $freeGoodsQuantity_23"/>
-
-			<!-- Rule L - check when MEA present 
-			<report test="$ruleL != $invoicedQuantity_10">
-			{<value-of select="f:getEdifactPosition($actualSegment)"/>} 
-			[QTY] - RULE L error on LIN+<value-of select="./S_LIN/D_1082"/>: #43 QTY+47 = (#43 QTY+47 * #42 MEA+ABW) - #43 QTY+192 \n
-			Actual value for QTY+47: <value-of select="$invoicedQuantity_10"/> != <value-of select="$unitOfMeasure_22"/> * <value-of select="$unitOfMeasure_22"/> - <value-of select="$freeGoodsQuantity_23"/> . \n
-			Expected value for QTY+47: <value-of select="$ruleL"/>
-			</report> -->
-
-		</rule>
-	</pattern>
-
-
+	
+	<!-- Rule M test --> 
 
 	<!-- XSLT function - getRuleF
 	Definition: Provide the expected result of the Rule F, for a received Line.
     @param: G_SG26, is the Node we want to test
-    @result: A decimal, result of the RULE F calculation
-  -->
+    @result: A decimal, result of the RULE F calculation  -->
+
 	<xsl:function name="f:getRuleF" as="xs:decimal">
 		<xsl:param name="G_SG26" as="node()"/>
 
@@ -395,8 +364,8 @@
 
 	<!-- XSLT function - getEdifactPosition
     @param: S_Node is the Segment Node provided by the assert rule
-    @result: A string that provide the position of the segment in the entire list of segments
-  -->
+    @result: A string that provide the position of the segment in the entire list of segments  -->
+
 	<xsl:function name="f:getEdifactPosition" as="xs:string">
 		<xsl:param name="S_Node" as="element()"/>
 
@@ -414,6 +383,5 @@
 		</xsl:variable>
 		<xsl:value-of select="substring($posSegment, 1, string-length($posSegment) - 1)"/>
 	</xsl:function>
-
 
 </schema>

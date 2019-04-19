@@ -280,7 +280,7 @@
 		</rule>
 	</pattern>
 	<!-- Check that GLN for NAD+AB or NAD+DP are different than NAD+BY-->
-	<pattern>
+<!--	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'AB' or D_3035 = 'DP']">
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
 			<let name="glnBuyer" value="/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'BY']/C_C082/D_3039"/>
@@ -289,9 +289,9 @@
         present. The segment should be present only if the GLN of this one is different than the one
         in NAD+BY ('<value-of select="$glnBuyer"/>')</report>
 		</rule>
-	</pattern>
+	</pattern>-->
 	<!-- Check that GLN for NAD+II or NAD+SR are different than NAD+SU-->
-	<pattern>
+<!--	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'II' or D_3035 = 'SR']">
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
 			<let name="glnSup" value="/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'SU']/C_C082/D_3039"/>
@@ -300,7 +300,7 @@
         present. The segment should be present only if the GLN of this one is different than the one
         in NAD+SU ('<value-of select="$glnSup"/>')</report>
 		</rule>
-	</pattern>
+	</pattern>-->
 	<!-- Check that NAD+UC is present with an empty GLN (=Home Delivery Order)-->
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'UC']">
