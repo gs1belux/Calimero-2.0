@@ -16,14 +16,14 @@
 
 	<!-- Rule F test -->
 	<pattern>
-		<rule context="/INTERCHANGE/M_INVOIC/G_SG26[S_MOA/C_C516/D_5025 = '125']">
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG26[G_SG34/S_MOA/C_C516/D_5025 = '125']">
 			<let name="actualSegment" value="./S_LIN"/>
 			
 			<!-- Get the quantity invoiced or the returned quantity -->
-			<let name="invoicedQuantity_10" value="number(./S_QTY[C_C186/D_6063 = '47' or C_C186/D_6063 = '61']/C_C186/D_6060)"/>
+			<let name="invoicedQuantity_10" value="number(if (exists(./S_QTY[C_C186/D_6063 = '61']/C_C186/D_6060)) then (./S_QTY[C_C186/D_6063 = '61']/C_C186/D_6060) else (./S_QTY[C_C186/D_6063 = '47']/C_C186/D_6060))"/>
 			<!-- Multiply factor for the Price-->
-			<let name="calcGrossPriceMult_9" value="number(if (exists(./S_MEA/C_C174/D_6314) and ./S_MEA/C_C174/D_6411 = ./S_QTY[C_C186/D_6063 = '47']/C_C186/D_6411) then (./S_MEA/C_C174/D_6314) else ('1'))"/>
-			<let name="calcGrossPriceUnit_11" value="number(./G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5118) * $calcGrossPriceMult_9"/>
+			<let name="calcGrossPriceMult_9" value="number(if (exists(./G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5284)) then (./G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5284) else ('1'))"/>
+			<let name="calcGrossPriceUnit_11" value="number(./G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5118) div $calcGrossPriceMult_9"/>
 			<!-- Charge Amount by line -->
 			<let name="sumChargeAmountLine_13" value="number(if (exists(./G_SG39/G_SG44/S_MOA[C_C516/D_5025 = '23']/C_C516/D_5004)) then (sum(./G_SG39/G_SG44/S_MOA[C_C516/D_5025 = '23']/C_C516/D_5004)) else ('0'))"/>
 			<!-- Allowance amount by line -->
@@ -33,11 +33,14 @@
 			<!-- Result from rule F -->
 			<let name="ruleF" value="f:getRuleF(.)"/>
 
-			<report test="f:getRuleF(.) != $lineTaxableAmount_12">
+			<report test="(format-number($ruleF,'0.00') != format-number($lineTaxableAmount_12,'0.00'))">
 			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
-			[SG26/LIN] - RULE F error: (#66 MOA+125)rate = [QTY+47 * PRI+AAB] + SUM(MOA+23) - SUM(MOA+204). \n
-			Actual value for MOA+125: <value-of select="$lineTaxableAmount_12"/> != <value-of select="$invoicedQuantity_10"/> * <value-of select="$calcGrossPriceUnit_11"/> + <value-of select="$sumChargeAmountLine_13"/> - <value-of select="$sumAllowanceAmountLine_14"/>. \n
-			Expected value for MOA+125:  <value-of select="$ruleF"/>
+			[SG26/LIN] - RULE F error: (#66 MOA+125)rate = [QTY+47 * PRI+AAB / unit price base value] + SUM(MOA+23) - SUM(MOA+204). \n
+			Actual value for MOA+125: <value-of select="format-number($lineTaxableAmount_12,'0.00')"/> != <value-of select="$invoicedQuantity_10"/> * <value-of select="$calcGrossPriceUnit_11"/> + <value-of select="$sumChargeAmountLine_13"/> - <value-of select="$sumAllowanceAmountLine_14"/>. \n
+			Expected value for MOA+125:  <value-of select="format-number(f:getRuleF(.),'0.00')"/> \n
+			Unit price base value:  <value-of select="$calcGrossPriceMult_9"/> \n
+			Gross price value recalculated with unit price base value:  <value-of select="$calcGrossPriceUnit_11"/> \n
+			Calculated getRuleF value:  <value-of select="$ruleF"/>
 			</report> 
 
 		</rule>
@@ -348,8 +351,8 @@
 		<!-- Get the quantity invoiced or the returned quantity -->
 		<xsl:variable name="invoicedQuantity_10" select="number($G_SG26/S_QTY[C_C186/D_6063 = '47' or C_C186/D_6063 = '61']/C_C186/D_6060)"/>
 		<!-- Multiply factor for the Price-->
-		<xsl:variable name="calcGrossPriceMult_9" select="number(if (exists($G_SG26/S_MEA/C_C174/D_6314) and $G_SG26/S_MEA/C_C174/D_6411 = $G_SG26/S_QTY[C_C186/D_6063 = '47']/C_C186/D_6411) then ($G_SG26/S_MEA/C_C174/D_6314) else ('1'))"/>
-		<xsl:variable name="calcGrossPriceUnit_11" select="number($G_SG26/G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5118) * $calcGrossPriceMult_9"/>
+		<xsl:variable name="calcGrossPriceMult_9" select="number(if (exists($G_SG26/G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5284)) then ($G_SG26/G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5284) else ('1'))"/>
+		<xsl:variable name="calcGrossPriceUnit_11" select="number($G_SG26/G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5118) div $calcGrossPriceMult_9"/>
 		<!-- Charge Amount by line -->
 		<xsl:variable name="sumChargeAmountLine_13" select="number(if (exists($G_SG26/G_SG39/G_SG44/S_MOA[C_C516/D_5025 = '23']/C_C516/D_5004)) then (sum($G_SG26/G_SG39/G_SG44/S_MOA[C_C516/D_5025 = '23']/C_C516/D_5004)) else ('0'))"/>
 		<!-- Allowance amount by line -->
@@ -357,7 +360,7 @@
 		<!-- Expected result: Line taxable amount -->
 		<xsl:variable name="lineTaxableAmount_12" select="number(sum($G_SG26/G_SG34/S_MOA[C_C516/D_5025 = '125']/C_C516/D_5004))"/>
 		<!-- Rule F result-->
-		<xsl:variable name="ruleF" select="$invoicedQuantity_10 * $calcGrossPriceUnit_11 + $sumChargeAmountLine_13 - $sumAllowanceAmountLine_14"/>
+		<xsl:variable name="ruleF" select="format-number($invoicedQuantity_10 * $calcGrossPriceUnit_11 + $sumChargeAmountLine_13 - $sumAllowanceAmountLine_14,'0.00')"/>
 
 		<xsl:value-of select="$ruleF"/>
 	</xsl:function>
