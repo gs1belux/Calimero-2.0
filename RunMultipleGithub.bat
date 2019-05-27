@@ -2,12 +2,12 @@
 
 Echo **********************************
 Echo Get updates from github ...
-curl -Os "https://raw.githubusercontent.com/dwillekens/calimero/master/EDI2XML-V3.jar"
-curl -Os "https://raw.githubusercontent.com/dwillekens/calimero/master/Validation-V3.jar"
-curl -Os "https://raw.githubusercontent.com/dwillekens/calimero/master/HO2C-V3-INVOIC-XML.xsd"
-curl -Os "https://raw.githubusercontent.com/dwillekens/calimero/master/HO2C-V3-INVOIC-XML.sch"
-curl -Os "https://raw.githubusercontent.com/dwillekens/calimero/master/HO2C-V3-INVOIC-Calculation.sch"
-curl -Os "https://raw.githubusercontent.com/dwillekens/calimero/master/tee.exe"
+curl -Os "https://raw.githubusercontent.com/gs1belux/calimero-2.0/master/EDI2XML-V3.jar"
+curl -Os "https://raw.githubusercontent.com/gs1belux/calimero-2.0/master/Validation-V3.jar"
+curl -Os "https://raw.githubusercontent.com/gs1belux/calimero-2.0/master/HO2C-V3-INVOIC-XML.xsd"
+curl -Os "https://raw.githubusercontent.com/gs1belux/calimero-2.0/master/HO2C-V3-INVOIC-XML.sch"
+curl -Os "https://raw.githubusercontent.com/gs1belux/calimero-2.0/master/HO2C-V3-INVOIC-Calculation.sch"
+curl -Os "https://raw.githubusercontent.com/gs1belux/calimero-2.0/master/tee.exe"
 
 Echo Start validation of folder "files" ...
 FOR %%G in ("files/*.edi") DO (
