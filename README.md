@@ -1,2 +1,0 @@
-# calimero
-EDI testrobot 
