@@ -328,8 +328,8 @@
 		<xs:sequence>
 			<xs:element name="D_2475" type="D_2475"/>
 			<xs:element name="D_2009" type="D_2009" minOccurs="0"/>
-			<xs:element name="D_2151" type="D_2151" minOccurs="0"/>
-			<xs:element name="D_2152" type="D_2152" minOccurs="0"/>
+			<xs:element name="D_2151" type="D_2151" minOccurs="1"/>
+			<xs:element name="D_2152" type="D_2152" minOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="C_C128">
@@ -2512,6 +2512,7 @@
 			<xs:enumeration value="129"/>
 			<xs:enumeration value="131"/>
 			<xs:enumeration value="150"/>
+			<xs:enumeration value="176"/>
 			<xs:enumeration value="201"/>
 			<xs:enumeration value="203"/>
 			<xs:enumeration value="204"/>

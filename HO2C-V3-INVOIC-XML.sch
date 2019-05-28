@@ -541,8 +541,8 @@
         The qualifier '12' for SG8/PCD can be used only with SG8/PAT+22 segment.</report>
 			<report test="./S_PCD/C_C501/D_5245 = '15' and ./S_PAT/D_4279 != '20'">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PCD/C501/5245]:
         The qualifier '15' for SG8/PCD can be used only with SG8/PAT+20 segment.</report>
-			<report test="./S_MOA/C_C516/D_5025 = '52' and ./S_PAT/D_4279 != '22'">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/MOA/C516/5025]:
-        The qualifier '52' for SG8/MOA can be used only with SG8/PAT+22 segment.</report>
+			<report test="./S_MOA/C_C516/D_5025 = '52'">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/MOA/C516/5025]:
+        The qualifier '52' for SG8/MOA can not be used with this segment.</report>
 			<report test="./S_MOA/C_C516/D_5025 = '201' and ./S_PAT/D_4279 != '20'">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/MOA/C516/5025]:
         The qualifier '201' for SG8/MOA can be used only with SG8/PAT+20 segment.</report>
 			<report test="count(./S_MOA) + count(./S_PCD) = 2">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8]: You can't have a SG8/MOA and a
@@ -1617,7 +1617,7 @@
 			<let name="codeValue" value="."/>
 			<assert test="$codelist//Code[@id = 'SG50_MOA_5025']/enumeration[@value = $codeValue]">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA/C516/5025]: The value '<value-of select="$codeValue"/>' for SG50/MOA with
-        qualifier ('5025') is not correct. The value should be '9', '77', '79', '113', '129', '150' or '496'.</assert>
+        qualifier ('5025') is not correct. The value should be '9', '77', '79', '113', '129', '150', '176' or '496'.</assert>
 		</rule>
 	</pattern>
 
@@ -1634,7 +1634,7 @@
 		<rule context="/INTERCHANGE/M_INVOIC">
 			<let name="actualSegment" value="./G_SG50[last()]/S_MOA"/>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '9']) > 1">
-				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+9 must occurs maximum one time.
+				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+9 must occur maximum one time.
 			</report>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '77']) != 1">
 				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+77 must occurs exactly one time.
@@ -1643,16 +1643,19 @@
 				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+79 must occurs exactly one time.
 			</report>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '113']) > 1">
-				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+113 must occurs maximum one time.
+				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+113 must occur maximum one time.
 			</report>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '129']) > 1">
-				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+129 must occurs maximum one time.
+				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+129 must occur maximum one time.
 			</report>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '150']) != 1">
 				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+150 must occurs exactly one time.
 			</report>
+			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '176']) > 1">
+				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+176 must occur maximum one time.
+			</report>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '496']) > 1">
-				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+496 must occurs maximum one time.
+				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+496 must occur maximum one time.
 			</report>
 		</rule>
 	</pattern>
