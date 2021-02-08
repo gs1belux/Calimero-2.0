@@ -103,7 +103,7 @@
 									<xs:sequence>
 										<xs:element name="S_LIN" type="S_LIN" maxOccurs="1"/>
 										<xs:element name="S_PIA" type="S_PIA" minOccurs="0" maxOccurs="25"/>
-										<xs:element name="S_IMD" type="S_IMD" minOccurs="0" maxOccurs="99"/>
+										<xs:element name="S_IMD" type="S_IMD" minOccurs="1" maxOccurs="99"/>
 										<xs:element name="S_MEA" type="S_MEA" minOccurs="0" maxOccurs="1"/>
 										<xs:element name="S_QTY" type="S_QTY" minOccurs="0" maxOccurs="5"/>
 										<xs:element name="S_DTM" type="S_DTM" minOccurs="0" maxOccurs="35"/>
@@ -266,7 +266,7 @@
 	</xs:complexType>
 	<xs:complexType name="C_C078">
 		<xs:sequence>
-			<xs:element name="D_3194" type="D_3194"/>
+			<xs:element name="D_3194" type="D_3194" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="D_3192" type="D_3192" minOccurs="0" maxOccurs="2"/>
 			<xs:element name="D_6345" type="D_6345" minOccurs="0"/>
 		</xs:sequence>
@@ -285,7 +285,7 @@
 	</xs:complexType>
 	<xs:complexType name="C_C088">
 		<xs:sequence>
-			<xs:element name="D_3434" type="D_3434"/>
+			<xs:element name="D_3434" type="D_3434" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="D_1131" type="D_1131"/>
 			<xs:element name="D_3055" type="D_3055"/>
 			<xs:element name="D_3432" type="D_3432" minOccurs="0"/>
@@ -317,7 +317,7 @@
 	</xs:complexType>
 	<xs:complexType name="C_C110">
 		<xs:sequence>
-			<xs:element name="D_4277" type="D_4277"/>
+			<xs:element name="D_4277" type="D_4277" minOccurs="0"/>
 			<xs:element name="D_1131" type="D_1131" minOccurs="0"/>
 			<xs:element name="D_3055" type="D_3055" minOccurs="0"/>
 			<xs:element name="D_4276_1" type="D_4276" minOccurs="0"/>
@@ -326,10 +326,10 @@
 	</xs:complexType>
 	<xs:complexType name="C_C112">
 		<xs:sequence>
-			<xs:element name="D_2475" type="D_2475"/>
+			<xs:element name="D_2475" type="D_2475" minOccurs="0"/>
 			<xs:element name="D_2009" type="D_2009" minOccurs="0"/>
-			<xs:element name="D_2151" type="D_2151" minOccurs="1"/>
-			<xs:element name="D_2152" type="D_2152" minOccurs="1"/>
+			<xs:element name="D_2151" type="D_2151" minOccurs="0"/>
+			<xs:element name="D_2152" type="D_2152" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="C_C128">

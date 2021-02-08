@@ -3,6 +3,16 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<ns uri="functions:1.0" prefix="f"/>
+	<ns uri="http://www.w3.org/2001/XMLSchema" prefix="xs"/>
+	<ns uri="utils" prefix="u"/>
+	
+	<!--	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC">
+			<report test="1 = 1">
+				Killroy was here!   
+			</report>
+		</rule>
+	</pattern>-->
 
 	<!-- Reference documents and variables -->
 	<let name="codelist" value="doc(&apos;sub/HO2C-V3-INVOIC-XML-CodeList.xml&apos;)"/>
@@ -23,6 +33,20 @@
       exists(/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'DP']/C_C082[D_3039 != $emptyGLN])"/>
 	<!--<let name="isHierarchicalDescription" value="/INTERCHANGE/M_INVOIC/G_SG10/S_CPS[D_7164 = 1]/D_7075 = '4'"/>-->
 
+	<!-- Functions -->
+	<function xmlns="http://www.w3.org/1999/XSL/Transform" name="u:gln" as="xs:boolean">
+		<param name="val"/>
+		<variable name="length" select="string-length($val) - 1"/>
+		<variable name="digits" select="reverse(for $i in string-to-codepoints(substring($val, 0, $length + 1)) return $i - 48)"/>
+		<variable name="weightedSum" select="sum(for $i in (0 to $length - 1) return $digits[$i + 1] * (1 + ((($i + 1) mod 2) * 2)))"/>
+		<value-of select="10 - ($weightedSum mod 10) = number(substring($val, $length + 1, 1))"/>
+	</function>
+	<function xmlns="http://www.w3.org/1999/XSL/Transform" name="u:mod97" as="xs:boolean">
+		<param name="val"/>
+		<variable name="digits" select="number(substring($val, 1, string-length($val) - 2))"/>
+		<variable name="chkdgt" select="97 - ($digits mod 97)"/>
+		<value-of select="number($chkdgt) = number(substring($val, string-length($val) - 1))"/>
+	</function>
 
 	<title>Schema for HO2C-V3-INVOIC-XML; 2002; EAN</title>
 
@@ -34,11 +58,25 @@
         number composed by 13 digits. </assert>
 		</rule>
 	</pattern>
+	<!-- Validation of GLN -->
+	<pattern>
+		<rule context="/INTERCHANGE/S_UNB/C_S002/D_0004">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<assert	test="matches(normalize-space(), '^[0-9]+$') and u:gln(normalize-space())">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[UNB/S002/0004] The value <value-of select="."/> has an invalid GLN checkdigit provided.</assert>
+		</rule>
+	</pattern>
 	<pattern>
 		<rule context="/INTERCHANGE/S_UNB/C_S003/D_0010">
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
 			<assert test="number(.)">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[UNB/S003/0010] The value <value-of select="."/> is a GLN must be a
         number composed by 13 digits. </assert>
+		</rule>
+	</pattern>
+	<!-- Validation of GLN -->
+	<pattern>
+		<rule context="/INTERCHANGE/S_UNB/C_S003/D_0010">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<assert	test="matches(normalize-space(), '^[0-9]+$') and u:gln(normalize-space())">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[UNB/S002/0010] The value <value-of select="."/> has an invalid GLN checkdigit provided.</assert>
 		</rule>
 	</pattern>
 
@@ -69,7 +107,8 @@
 	</pattern>
 
 	<!-- BGM -->
-
+	<let name="isCreditNote" value="exists(/INTERCHANGE/M_INVOIC/S_BGM[C_C002/D_1001 = '381'])"/>
+	
 	<!-- DTM -->
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/S_DTM/C_C507/D_2005">
@@ -101,7 +140,7 @@
 			<report
         test="count(./S_DTM/C_C507[D_2005 = '35']) != 1 and count(./S_DTM/C_C507[D_2005 = '1']) != 1"
         > {<value-of select="f:getEdifactPosition($actualSegment)"/>}[DTM/C507/2005]: The DTM+35 (Actual delivery date/time) or the DTM+1 (Actual service
-        completion date/time) is requeried.</report>
+        completion date/time) is required.</report>
 		</rule>
 	</pattern>
 
@@ -125,37 +164,47 @@
 	<let name="isAdjustment" value="exists(/INTERCHANGE/M_INVOIC/S_ALI[D_4183 = '79E'])"/>
 	
 	<!-- FTX -->
+	<let name="isFreeTextPresent" value="exists(/INTERCHANGE/M_INVOIC/S_FTX[D_4451 = 'TXD'])"/>
+		
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/S_FTX">
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
 			<let name="qual" value="./D_4451"/>
 			<report test="$qual != 'TXD' and count(./C_C108/D_4440) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/C108/4440]: The element
-        4440 (Free text value) can appears only once when you use it with FTX+<value-of
+        4440 (Free text value) can appear only once when you use it with FTX+<value-of
           select="$qual"/>.</report>
-			<report test="$qual != 'TXD' and count(./D_3453) > 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/3453]: The element 3453 (Langage
+			<report test="$qual != 'TXD' and count(./D_3453) > 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/3453]: The element 3453 (Language
         name code) under the segment FTX+<value-of select="$qual"/> is not correct. This element can
         appears with FTX+TXD.</report>
-			<report
-        test="$qual = 'PMT' and ./C_C108/D_4440 != 'INDEMNITE FORFAITAIRE POUR FRAIS DE RECOUVREMENT DE 40 EUROS'"
+<!--			<report
+        test="$qual = 'PMT' and ./C_C108/D_4440 != 'INDEMNITE FORFAITAIRE POUR FRAIS DE RECOUVREMENT DE 40 EUROS' and count(/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'SU'][D_3207 = 'FR']) > 0"
         > {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/3453]: The element 4440 (Free text value) under the segment FTX+<value-of
-          select="$qual"/> is not correct. The value of this element, if revelent, should be
-        exactly: 'INDEMNITE FORFAITAIRE POUR FRAIS DE RECOUVREMENT DE 40 EUROS'.</report>
+          select="$qual"/> is not correct. The value of this element, if relevent - supplier comes from France, should be
+        exactly: 'INDEMNITE FORFAITAIRE POUR FRAIS DE RECOUVREMENT DE 40 EUROS'.</report>-->
 		</rule>
 	</pattern>
 
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC">
-			<let name="actualSegment" value="./S_FTX"/>
-			<report test="count(./S_FTX[D_4451 = 'TXD']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/4451]: The FTX+TXD can occurs maximum
+			<let name="actualSegment" value="./S_FTX[1]"/>
+			<report test="count(./S_FTX[D_4451 = 'TXD']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/4451]: The FTX+TXD can occur maximum
         one time </report>
-			<report test="count(./S_FTX[D_4451 = 'AAC']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/4451]: The FTX+AAC can occurs maximum
+			<report test="count(./S_FTX[D_4451 = 'AAC']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/4451]: The FTX+AAC can occur maximum
         one time </report>
-			<report test="count(./S_FTX[D_4451 = 'PMT']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/4451]: The FTX+PMT can occurs maximum
-        one time </report>
-			<report
+<!--			<report test="count(./S_FTX[D_4451 = 'PMT']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/4451]: The FTX+PMT can occur maximum
+        one time </report>-->
+<!--			<report
         test="count(./S_FTX[D_4451 = 'PMT']) != 1 and count(/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'SU'][D_3207 = 'FR']) > 0"
         > {<value-of select="f:getEdifactPosition($actualSegment)"/>}[FTX/4451]: The FTX+PMT is mandatory whe the supplier comes from France (Value 'Country
-        code', SG2/NAD+SU/3207 = 'FR').</report>
+        code', SG2/NAD+SU/3207 = 'FR').</report>-->
+		</rule>
+	</pattern>
+		
+	<!-- Check presence of FTX+TXD allowed -->
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/S_FTX[D_4451 = 'TXD']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="$orderType = '380' and count(/INTERCHANGE/M_INVOIC/G_SG16/G_SG22/S_TAX/C_C243[D_5279 = 'FTXHD']) = 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[S_TAX] When using FTX+TXD, 'FTXHD' should be present in at least one S_TAX/C_C243/D_5279 segment.</report>
 		</rule>
 	</pattern>
 
@@ -181,28 +230,28 @@
 		<rule context="/INTERCHANGE/M_INVOIC">
 			<let name="actualSegment" value="./G_SG1/S_RFF"/>
 			<!-- Mandatory element -->
-			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'AAK']) != 1 and $orderType = '380' and $isAdjustment = false">
-        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG1/RFF] The segment RFF+AAK should occurs exactly one time in case of Invoice message
-        (BGM+380) when no adjustment. </report>
-			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'ON']) != 1 and $orderType = '380' and $isAdjustment = false">
-        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG1/RFF] The segment RFF+ON should occurs exactly one time in case of Invoice message
-        (BGM+380) when no adjustment. </report>
+<!--			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'AAK']) != 1 and $orderType = '380' and not(exists(/INTERCHANGE/M_INVOIC/S_ALI[D_4183 = '79E']))">
+        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG1/RFF] The segment RFF+AAK should occur exactly one time in case of Invoice message
+        (BGM+380) when no adjustment. </report>-->
+			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'ON']) != 1 and $orderType = '380' and not(exists(/INTERCHANGE/M_INVOIC/S_ALI[D_4183 = '79E']))">
+        { }[SG1/RFF] The segment RFF+ON should occur exactly one time in case of Invoice message
+        (BGM+380) when no adjustment.</report>
 			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'IV']) != 1 and $orderType = '381'">
-        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG1/RFF] The segment RFF+IV should occurs exactly one time in case of Credit note message
+        { }[SG1/RFF] The segment RFF+IV should occur exactly one time in case of Credit note message
         (BGM+381). </report>
 			<!-- Duplicated elements -->
-			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'DL']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG1/RFF] The segment RFF+DL
-        should occurs maximum one time. </report>
-			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'ALQ']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG1/RFF] The segment RFF+ALQ
-        should occurs maximum one time. </report>
-			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'ACE']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG1/RFF] The segment RFF+ACE
-        should occurs maximum one time. </report>
-			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'ALO']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG1/RFF] The segment RFF+ALO
-        should occurs maximum one time. </report>
-			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'CD']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG1/RFF] The segment RFF+CD
-        should occurs maximum one time. </report>
-			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'PQ']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG1/RFF] The segment RFF+PQ
-        should occurs maximum one time. </report>
+			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'DL']) > 1"> { }[SG1/RFF] The segment RFF+DL
+        should occur maximum one time. </report>
+			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'ALQ']) > 1"> { }[SG1/RFF] The segment RFF+ALQ
+        should occur maximum one time. </report>
+			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'ACE']) > 1"> { }[SG1/RFF] The segment RFF+ACE
+        should occur maximum one time. </report>
+			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'ALO']) > 1"> { }[SG1/RFF] The segment RFF+ALO
+        should occur maximum one time. </report>
+			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'CD']) > 1"> { }[SG1/RFF] The segment RFF+CD
+        should occur maximum one time. </report>
+			<report test="count(./G_SG1/S_RFF/C_C506[D_1153 = 'PQ']) > 1"> { }[SG1/RFF] The segment RFF+PQ
+        should occur maximum one time. </report>
 		</rule>
 	</pattern>
 
@@ -253,30 +302,37 @@
         a number composed by 13 digits.</report>
 		</rule>
 	</pattern>
+	<!-- Validation of GLN -->
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2">
+			<let name="actualSegment" value="./S_NAD"/>
+			<assert	test="matches(normalize-space(./S_NAD/C_C082/D_3039), '^[0-9]+$') and (u:gln(normalize-space(./S_NAD/C_C082/D_3039)) or ./S_NAD/C_C082/D_3039 = '0000000000000')">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD/C082/3039] The value <value-of select="./S_NAD/C_C082/D_3039"/> has an invalid GLN checkdigit provided. <value-of select="u:gln(normalize-space(./S_NAD/C_C082/D_3039))"/></assert>
+		</rule>
+	</pattern>
 
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC">
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
 			<!-- Mandatory element -->
-			<report test="count(./G_SG2/S_NAD[D_3035 = 'IV']) != 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD] The segment NAD+IV should
-        occurs exactly one time. </report>
-			<report test="count(./G_SG2/S_NAD[D_3035 = 'BY']) != 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD] The segment NAD+BY should
-        occurs exactly one time. </report>
-			<report test="count(./G_SG2/S_NAD[D_3035 = 'SU']) != 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD] The segment NAD+SU should
-        occurs exactly one time. </report>
+			<report test="count(./G_SG2/S_NAD[D_3035 = 'IV']) != 1">{ }[SG2/NAD] The segment NAD+IV should
+        occur exactly one time. </report>
+			<report test="count(./G_SG2/S_NAD[D_3035 = 'BY']) != 1">{ }[SG2/NAD] The segment NAD+BY should
+        occur exactly one time. </report>
+			<report test="count(./G_SG2/S_NAD[D_3035 = 'SU']) != 1">{ }[SG2/NAD] The segment NAD+SU should
+        occur exactly one time. </report>
 			<!-- Duplicated elements -->
 			<report test="count(./G_SG2/S_NAD[D_3035 = 'AB']) > 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD] The segment NAD+AB should
-        not occurs more than once. </report>
+        not occur more than once. </report>
 			<report test="count(./G_SG2/S_NAD[D_3035 = 'DP']) > 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD] The segment NAD+DP should
-        not occurs more than once. </report>
+        not occur more than once. </report>
 			<report test="count(./G_SG2/S_NAD[D_3035 = 'II']) > 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD] The segment NAD+II should
-        not occurs more than once. </report>
+        not occur more than once. </report>
 			<report test="count(./G_SG2/S_NAD[D_3035 = 'SR']) > 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD] The segment NAD+SR should
-        not occurs more than once. </report>
+        not occur more than once. </report>
 			<report test="count(./G_SG2/S_NAD[D_3035 = 'SF']) > 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD] The segment NAD+SF should
-        not occurs more than once. </report>
+        not occur more than once. </report>
 			<report test="count(./G_SG2/S_NAD[D_3035 = 'UC']) > 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD] The segment NAD+UC should
-        not occurs more than once. </report>
+        not occur more than once. </report>
 		</rule>
 	</pattern>
 	<!-- Check that GLN for NAD+AB or NAD+DP are different than NAD+BY-->
@@ -308,6 +364,62 @@
 			<report test="./C_C082/D_3039 != $emptyGLN"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD] The segment NAD+<value-of
           select="./D_3035"/> can only be used with a dummy GLN ('<value-of select="$emptyGLN"
         />').</report>
+		</rule>
+	</pattern>
+	
+	<!-- Check presence of RFF+VA or RFF+XA (in case no RFF+VA) on NAD+SU -->
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'SU']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="count(/INTERCHANGE/M_INVOIC/G_SG3/S_RFF[C_C506/D_1153 = 'VA']) and count(/INTERCHANGE/M_INVOIC/G_SG3/S_RFF[C_C506/D_1153 = 'XA'])"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD+SU] The
+        segment NAD+SU must be followed by RFF+VA or RFF+XA (in case not VAT viable) segment. Not both.</report>
+		</rule>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2[S_NAD/D_3035 = 'SU']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'G_')]"/>
+			<report test="count(./G_SG3/S_RFF[C_C506/D_1153 = 'VA' or C_C506/D_1153 = 'XA']) = 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD+SU] The
+        segment NAD+SU must be followed by RFF+VA or RFF+XA (in case not VAT viable) segment. One should be present.</report>
+		</rule>
+	</pattern>
+	
+		<!-- Check presence of RFF+VA or RFF+XA (in case no RFF+VA) on NAD+IV -->
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'IV']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="count(/INTERCHANGE/M_INVOIC/G_SG3/S_RFF[C_C506/D_1153 = 'VA']) and count(/INTERCHANGE/M_INVOIC/G_SG3/S_RFF[C_C506/D_1153 = 'XA'])"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD+IV] The
+        segment NAD+IV must be followed by RFF+VA or RFF+XA (in case not VAT viable) segment. Not both.</report>
+		</rule>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2[S_NAD/D_3035 = 'IV']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'G_')]"/>
+			<report test="count(./G_SG3/S_RFF[C_C506/D_1153 = 'VA' or C_C506/D_1153 = 'XA']) = 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD+IV] The
+        segment NAD+IV must be followed by RFF+VA or RFF+XA (in case not VAT viable) segment. One should be present.</report>
+		</rule>
+	</pattern>
+	
+		<!-- Check presence of RFF+VA or RFF+XA (in case no RFF+VA) on NAD+BY -->
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'BY']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="count(/INTERCHANGE/M_INVOIC/G_SG3/S_RFF[C_C506/D_1153 = 'VA']) and count(/INTERCHANGE/M_INVOIC/G_SG3/S_RFF[C_C506/D_1153 = 'XA'])"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD+BY] The
+        segment NAD+BY must be followed by RFF+VA or RFF+XA (in case not VAT viable) segment. Not both.</report>
+		</rule>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2[S_NAD/D_3035 = 'BY']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'G_')]"/>
+			<report test="count(./G_SG3/S_RFF[C_C506/D_1153 = 'VA' or C_C506/D_1153 = 'XA']) = 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD+BY] The
+        segment NAD+BY must be followed by RFF+VA or RFF+XA (in case not VAT viable) segment. One should be present.</report>
+		</rule>
+	</pattern>
+	
+		<!-- Check presence of RFF+VA or RFF+XA (in case no RFF+VA) on NAD+II -->
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/S_NAD[D_3035 = 'II']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="count(/INTERCHANGE/M_INVOIC/G_SG3/S_RFF[C_C506/D_1153 = 'VA']) and count(/INTERCHANGE/M_INVOIC/G_SG3/S_RFF[C_C506/D_1153 = 'XA'])"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD+II] The
+        segment NAD+II must be followed by RFF+VA or RFF+XA (in case not VAT viable) segment. Not both.</report>
+		</rule>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2[S_NAD/D_3035 = 'II']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'G_')]"/>
+			<report test="count(./G_SG3/S_RFF[C_C506/D_1153 = 'VA' or C_C506/D_1153 = 'XA']) = 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/NAD+II] The
+        segment NAD+II must be followed by RFF+VA or RFF+XA (in case not VAT viable) segment. One should be present.</report>
 		</rule>
 	</pattern>
 
@@ -428,6 +540,41 @@
         and BIC) at least under one of those two NAD: NAD+SU or NAD+IV. </report>
 		</rule>
 	</pattern>
+<!--	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/S_FII/C_C088/D_3434">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<let name="codeValue" value="translate(normalize-space(.), ' ', '')"/>
+			<let name="iban" value="translate(normalize-space(/INTERCHANGE/M_INVOIC/G_SG2/S_FII/C_C078/D_3194), ' ', '')"/>
+			<let name="ibanBank" value="substring($iban, 5, 3)"/>
+			<let name="ibanBic" value="concat($ibanBank, $codeValue)"/>
+			<assert test="$codelist//Code[@id = 'BIC']/enumeration[@value = $codeValue]">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/FII/3434]: The value '<value-of select="$codeValue"/>' for BIC identification code is not valid in 'BE'.</assert>
+			<assert test="$codelist//Code[@id = 'IBANBIC']/enumeration[@value = $ibanBic]">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/FII/3434]: The combination of bank identification '<value-of select="$ibanBank"/>' and BIC '<value-of select="$codeValue"/>' is not valid.</assert>
+		</rule>
+	</pattern>
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/S_FII/C_C088/D_3434">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<let name="codeValue" value="translate(normalize-space(.), ' ', '')"/>
+			<report	test="string-length($codeValue) != 8">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/FII/3434] BIC number <value-of select="$codeValue"/> is not 8 meaningfull characters.</report>
+		</rule>
+	</pattern>
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/S_FII/C_C078/D_3194">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<let name="codeValue" value="translate(normalize-space(.), ' ', '')"/>
+			<let name="length" value="string-length($codeValue)"/>
+			<let name="digits" value="if (string-length($codeValue) >= 16) then xs:decimal(number(substring($codeValue, 5, 10))) else 0"/>
+			<let name="chkdgt" value="$digits mod 97"/>
+			<let name="dummyValue" value="concat(substring($codeValue, string-length($codeValue) - 1),substring($codeValue, string-length($codeValue) - 1),'111400')"/>
+			<let name="ibanChkdgt" value="if (string-length($codeValue) >=16) then (98 - (number($dummyValue) mod 97)) else 0"/>
+			<report	test="number($chkdgt) != 0 and number($chkdgt) != number(substring($codeValue, string-length($codeValue) - 1))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/FII/3194] The IBANnr <value-of select="$codeValue"/> has an invalid checkdigit provided. Calculated MOD97 checkdigit = <value-of select="$chkdgt"/>. digits = <value-of select="$digits"/> orig = <value-of select="number(substring($codeValue, string-length($codeValue) - 1))"/> mod97 = <value-of select="$digits mod 97"/> </report>
+			<report	test="number($chkdgt) = 0 and 97 != number(substring($codeValue, string-length($codeValue) - 1))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/FII/3194] The IBANnr <value-of select="$codeValue"/> has an invalid checkdigit provided. Calculated MOD97 checkdigit = 0 (97). digits = <value-of select="$digits"/> orig = <value-of select="number(substring($codeValue, string-length($codeValue) - 1))"/> mod97 = <value-of select="$digits mod 97"/> </report>
+			<report	test="string-length($codeValue) != 16">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/FII/3194] IBAN number <value-of select="$codeValue"/> is not 16 alphanumerical characters.</report>
+			<report	test="number($ibanChkdgt) != number(substring($codeValue, 3, 2)) and substring($codeValue, 1, 2) = 'BE'">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/FII/3194] The checkdigits of IBANnr <value-of select="$codeValue"/> after 'BE' has an invalid value provided. Calculated MOD97 checkdigits = <value-of select="$ibanChkdgt"/> </report>
+		</rule>
+	</pattern>-->
 
 	<!-- SG2/SG3/RFF -->
 	<pattern>
@@ -447,17 +594,46 @@
 			<report
         test="($nadQual = 'IV' or $nadQual = 'II' or $nadQual = 'SU' or $nadQual = 'BY') and count(./G_SG3/S_RFF[C_C506/D_1153 = 'VA' or 'XA']) = 0"
         > {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/SG3/RFF] The segment RFF+VA(Vat number) or the RFF+XA(Company/place registration
-        number) should be always appears exactly one time under those NAD segments: NAD+IV, NAD+II,
+        number) should always appear exactly one time under those NAD segments: NAD+IV, NAD+II,
         NAD+SU, NAD+BY. </report>
+			<!-- Exclusive element -->
+			<report
+        test="($nadQual = 'SU' or $nadQual = 'BY') and count(./G_SG3/S_RFF[C_C506/D_1153 = 'VA']) >= 1 and count(./G_SG3/S_RFF[C_C506/D_1153 = 'XA']) >= 1"
+        > {<value-of select="f:getEdifactPosition($actualSegment[1])"/>}[SG2/SG3/RFF] The segment RFF+VA(Vat number) or the RFF+XA(Company/place registration
+        number) should not appear both under those NAD segments: NAD+SU, NAD+BY. </report>
 			<!-- Duplicated elements -->
 			<report test="count(./G_SG3/S_RFF[C_C506/D_1153 = 'VA']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/SG3/RFF] The segment
-        RFF+VA should not occurs more than once. </report>
+        RFF+VA should not occur more than once. </report>
 			<report test="count(./G_SG3/S_RFF[C_C506/D_1153 = 'XA']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/SG3/RFF] The segment
-        RFF+XA should not occurs more than once. </report>
+        RFF+XA should not occur more than once. </report>
 			<report test="count(./G_SG3/S_RFF[C_C506/D_1153 = 'YC1']) > 1"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/SG3/RFF] The segment
-        RFF+YC1 should not occurs more than once. </report>
+        RFF+YC1 should not occur more than once. </report>
 		</rule>
 	</pattern>
+	<!-- Validation of CBE and VAT numbers -->
+<!--	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/G_SG3/S_RFF[C_C506/D_1153 = 'VA']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<let name="length" value="string-length(./C_C506/D_1154)"/>
+			<let name="vatnr" value="./C_C506/D_1154"/>
+			<let name="cbenr" value="substring(./C_C506/D_1154, 3)"/>
+			<let name="digits" value="number(substring($cbenr, 1, string-length($cbenr) - 2))"/>
+			<let name="chkdgt" value="97 - ($digits mod 97)"/>
+			<report	test="number($chkdgt) != number(substring($cbenr, string-length($cbenr) - 1))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/SG3/RFF/C506/1154] The value <value-of select="$vatnr"/> has an invalid VAT checkdigit provided. Calculted MOD97 checkdigit = <value-of select="$chkdgt"/>.</report>
+			<report	test="string-length($vatnr) != 12 or (substring($vatnr, 1,2) != 'BE' and substring($vatnr, 1,2) != 'LU')">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/SG3/RFF/C506/1154] VAT number <value-of select="$cbenr"/> is not 'BE'/'LU' followed by 10 digits.</report>
+		</rule>
+	</pattern>
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG2/G_SG3/S_RFF[C_C506/D_1153 = 'XA']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<let name="length" value="string-length(./C_C506/D_1154)"/>
+			<let name="cbenr" value="./C_C506/D_1154"/>
+			<let name="digits" value="number(substring($cbenr, 1, string-length($cbenr) - 2))"/>
+			<let name="chkdgt" value="97 - ($digits mod 97)"/>
+			<report	test="number($chkdgt) != number(substring($cbenr, string-length($cbenr) - 1))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/SG3/RFF/C506/1154] The value <value-of select="$cbenr"/> has an invalid CBE checkdigit provided. Calculted MOD97 checkdigit = <value-of select="$chkdgt"/>.</report>
+			<report	test="string-length($cbenr) != 10">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG2/SG3/RFF/C506/1154] CBE number <value-of select="$cbenr"/> is not 10 digits.</report>
+		</rule>
+	</pattern>-->
 
 	<!-- SG7/CUX -->
 	<pattern>
@@ -476,8 +652,14 @@
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG7/S_CUX/D_5402">
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
-			<report test="not(number(.))  and . != 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG7/S_CUX/D_5402]: The Rate of Exchange element in the SG7/CUX
+			<report test="not(number(translate(., ',', '.')))  and . != 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG7/S_CUX/D_5402]: The Rate of Exchange element in the SG7/CUX
         segment is not a number. </report>
+		</rule>
+	</pattern>
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG7/S_CUX">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="exists(./C_C504[2]) and count(/INTERCHANGE/M_INVOIC/G_SG50[S_MOA/C_C516/D_5025 = '176']) = 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG7/S_CUX/D_6245(2)]: Target currency specified without MOA+176 present. </report>
 		</rule>
 	</pattern>
 	<pattern>
@@ -517,14 +699,14 @@
         code ('2379') is not correct. The value should be '102' for CCYYMMDD.</assert>
 		</rule>
 	</pattern>
-	<!-- Depedndencies with SG7/CUX segment -->
+	
+	<!-- Dependencies with SG7/CUX segment -->
 	<pattern>
-		<rule context="/INTERCHANGE/M_INVOIC/G_SG7">
-			<let name="actualSegment" value="./G_SG7"/>
-			<let name="isTarget" value="exists(./S_CUX/C-C504/D_6347)"/>
-			<report test="not($isTarget) and exists(./S_DTM)">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG7/DTM]: The SG7/DTM segment should not
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG7/S_CUX">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="(count(./S_CUX/C_C504/D_6347) = 1) and exists(./S_DTM)">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG7/DTM]: The SG7/DTM segment should not
         be present if there is no Target Currency in the CUX segment.</report>
-			<report test="$isTarget and not(exists(./S_DTM))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG7/DTM]: The SG7/DTM segment should be
+			<report test="(count(./S_CUX/C_C504/D_6347) gt 1) and not(exists(./S_DTM))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG7/DTM]: The SG7/DTM segment should be
         present if there is a Target Currency in the CUX segment.</report>
 		</rule>
 	</pattern>
@@ -548,13 +730,29 @@
 			<report test="count(./S_MOA) + count(./S_PCD) = 2">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8]: You can't have a SG8/MOA and a
         SG8/PCD segment if the SG8/PAT segment is present. You have to choose between penalty
         percent (PCD) or penalty amount (MOA). </report>
-			<report test="count(./S_MOA) + count(./S_PCD) = 0">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8]: You must have a SG8/MOA or a
+<!--			<report test="count(./S_MOA) + count(./S_PCD) = 0">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8]: You must have a SG8/MOA or a
         SG8/PCD segment if the SG8/PAT segment is present. You have to choose between penalty
-        percent (PCD) or penalty amount (MOA). </report>
+        percent (PCD) or penalty amount (MOA). </report>-->
 		</rule>
 	</pattern>
 
 	<!-- SG8/PAT-->
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG8">
+			<let name="actualSegment" value="descendant-or-self::*[starts-with(name(),'S_')][last()]"/>
+<!--			<report test="./S_PAT/D_4279 = '3' and ./S_PAT/C_C112/D_2475 = '5' and not(exists(./S_PAT/C_C112/D_2009))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PAT/C112/2009]:
+        The segment 'PAT+3++5' must have a terms time relation code.</report>-->
+<!--			<report test="./S_PAT/D_4279 = '3' and ./S_PAT/C_C112/D_2475 = '5' and not(exists(./S_PAT/C_C112/D_2151))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PAT/C112/2151]:
+        The segment 'PAT+3++5' must have a period type code 'D' (days).</report>-->
+<!--			<report test="./S_PAT/D_4279 = '3' and ./S_PAT/C_C112/D_2475 = '5' and not(exists(./S_PAT/C_C112/D_2152))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PAT/C112/2152]:
+        The segment 'PAT+3++5' must have a period count quantity (days).</report>-->
+			<report test="./S_PAT/D_4279 = '22' and not(exists(/INTERCHANGE/M_INVOIC/G_SG16/S_ALC[C_C214/D_7161 = 'EAB']))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PAT/4279]:
+        The segment 'PAT+22' must only be used in combination with (#31) 'ALC+A++++EAB'.</report>
+			<report test="./S_PAT/D_4279 = '20' and not(exists(./S_PAT[C_C112/D_2475 = '5'])) and not(exists(/INTERCHANGE/M_INVOIC/G_SG8/S_DTM[C_C507/D_2005 = '13']))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PAT]:The segment 'PAT+20' must have a relative or absolute date.</report>
+			<report test="./S_PAT/D_4279 = '3' and not(exists(./S_PAT[C_C112/D_2475 = '5'])) and not(exists(/INTERCHANGE/M_INVOIC/G_SG8/S_DTM[C_C507/D_2005 = '13']))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PAT]:The segment 'PAT+3' must have a relative date.</report>
+		</rule>
+	</pattern>
+	
 	<!-- SG8/DTM-->
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG8/S_DTM/C_C507/D_2005">
@@ -566,6 +764,13 @@
 		</rule>
 	</pattern>
 	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG8/S_DTM[C_C507/D_2005 = '13']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="not(exists(/INTERCHANGE/M_INVOIC/G_SG8/S_PAT[D_4279 = '20']))">
+        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/DTM/C507/2005]: SG8/DTM+13 can only be used with PAT+20.</report>
+		</rule>
+	</pattern>
+	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG8/S_DTM/C_C507/D_2379">
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
 			<let name="codeValue" value="."/>
@@ -574,7 +779,14 @@
         code ('2379') is not correct. The value should be '102' for CCYYMMDD.</assert>
 		</rule>
 	</pattern>
-
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG8/S_DTM">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="exists(/INTERCHANGE/M_INVOIC/G_SG8/S_PAT/C_C112)">
+        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/DTM]: SG8/DTM must be used to express an absolute date but never when C112 of #18 PAT 
+        is used to express a relative date.</report>
+		</rule>
+	</pattern>
 
 	<!-- SG8/PCD-->
 	<pattern>
@@ -584,6 +796,17 @@
 			<assert test="$codelist//Code[@id = 'SG8_PCD_5245']/enumeration[@value = $codeValue]">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PCD/C501/5245]: The value '<value-of select="$codeValue"/>' for SG8/PCD with Percentage
         type code qualifier ('5245') is not correct. The value should can be '12' or '15'.</assert>
+		</rule>
+	</pattern>
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG8/S_PCD">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="count(./C_C501/D_5245 = '12') and not(exists(/INTERCHANGE/M_INVOIC/G_SG8/S_PAT/D_4279 = '22'))">
+        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PCD]: Code value SG8/PCD+12 can only be used if DE 4279 of the preceding PAT segment (#18)  
+        has code value 22 (= discount).</report>
+			<report test="count(./C_C501/D_5245 = '15') and not(exists(/INTERCHANGE/M_INVOIC/G_SG8/S_PAT/D_4279 = '20'))">
+        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PCD]: Code value SG8/PCD+15 can only be used if DE 4279 of the preceding PAT segment (#18)  
+        has code value 20 (= penalty terms).</report>
 		</rule>
 	</pattern>
 
@@ -602,6 +825,8 @@
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
 			<report test="count(./D_5482) = 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PCD/C501/5482]: The value 'Percentage basis
         indication code' is mandatory and doesn't appears under SG8/ALC segment.</report>
+			<report test="count(./D_5249) = 0 or not(exists(./D_5249 = '13'))">
+        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG8/PCD]: Code value SG8/PCD/C501/5249 must be '13' to indicate percentage basis (13 = invoice value).</report>
 		</rule>
 	</pattern>
 
@@ -661,28 +886,25 @@
 			<report test="./S_PCD/C_C501/D_5245 = '2' and $alcQual != 'C'">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16/SG19/PCD/C501/5245]: The PCD+2 element Allowance can only be present with SG16/ALC+C.
 			</report>
-			<report test="./S_MOA/C_C516/D_5025 = '204' and $alcQual != 'A'">
+<!--			<report test="./S_MOA/C_C516/D_5025 = '204' and $alcQual != 'A'">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16/SG20/MOA/C516/5025]: The MOA+204 element Allowance Amount can only be present with SG16/ALC+A.
 			</report>
 			<report test="./S_MOA/C_C516/D_5025 = '23' and $alcQual != 'C'">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16/SG20/MOA/C516/5025]: The MOA+23 element Charge Amount can only be present with SG16/ALC+C.
+			</report>-->
+			<report test="./G_SG20/S_MOA/C_C516/D_5025 = '204' and $alcQual != 'A'">
+        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16/SG20/MOA/C516/5025]: The MOA+204 element Allowance Amount can only be present with SG16/ALC+A.
 			</report>
-			<report test="./G_SG22/S_MOA/C_C516/D_5025 = '204' and $alcQual != 'A'">
-        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16/SG22/MOA/C516/5025]: The MOA+204 element Allowance Amount can only be present with SG16/ALC+A.
-			</report>
-			<report test="./G_SG22/S_MOA/C_C516/D_5025 = '23' and $alcQual != 'C'">
-        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16/SG22/MOA/C516/5025]: The MOA+23 element Charge Amount can only be present with SG16/ALC+C.
+			<report test="./G_SG20/S_MOA/C_C516/D_5025 = '23' and $alcQual != 'C'">
+        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16/SG20/MOA/C516/5025]: The MOA+23 element Charge Amount can only be present with SG16/ALC+C.
 			</report>
 			<report test="./G_SG22/S_MOA/C_C516/D_5025 = '52' and ($alcQual != 'A' or ./S_ALC/C_C214/D_7161 != 'EAB')">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16/SG22/MOA/C516/5025]: The MOA+23 element Charge Amount can only be present with SG16/ALC+A with Special service description code = 'EAB'.
 			</report>
-			<report test="count(./S_MOA) + count(./S_PCD) ge 2">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16]: You can't have a SG16/SG20/MOA and a
+			<report test="count(./G_SG20/S_MOA) + count(./G_SG19/S_PCD) ge 2">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16]: You can't have a SG16/SG20/MOA and a
         SG16/SG19/PCD segment if the SG16/ALC segment is present. You have to choose between penalty percent (PCD) or penalty amount (MOA). </report>
 			<!--<report test="count(./G_SG20/S_MOA) + count(./G_SG19/S_PCD) = 0">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16]: You must have a SG16/SG20/MOA or a
         SG16/SG19/PCD segment if the SG16/ALC segment is present. You have to choose between penalty percent (PCD) or penalty amount (MOA). </report>-->
-			<report test="count(./G_SG22/S_PCD) + count(./G_SG22/S_MOA) lt 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16]: You must have a SG16/SG20/MOA or a
-        SG16/SG19/PCD segment if the SG16/ALC segment is present. You have to choose between penalty percent (PCD) or penalty amount (MOA). <value-of select="count(./G_SG22/S_PCD) + count(./G_SG22/S_MOA)"/>
-			</report>
 		</rule>
 	</pattern>
 
@@ -782,6 +1004,9 @@
 			<let name="actualSegment" value="descendant-or-self::*[starts-with(name(),'S_')][last()]"/>
 			<report test="exists(./S_TAX/C_C243/D_5278) and not(exists(./S_MOA))">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16/SG22/MOA]: The SG16/SG22/MOA segment is mandatory if this is a case 'VAT is due' (SG16/SG22/TAX/C243/5278 Duty or tax or fee rate is present) </report>
+			<report test="count(./S_MOA) lt 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG16]: You must have a SG16/SG22/MOA 
+        segment if the SG16/SG22/TAX segment is present. <value-of select="count(./S_MOA)"/>
+			</report>
 		</rule>
 	</pattern>
 
@@ -824,6 +1049,9 @@
 			<report test="string-length(substring-after(., '.')) &gt; 2">
 	  {<value-of select="f:getEdifactPosition($actualSegment)"/>}
           [SG16/SG22/TAX/C243/5278]:  The value 'Duty or tax or free rate' has more than 2 digits '<value-of select="."/>'.</report>
+		  	<report test="string-length(substring-after(., '.')) != 2">
+	  {<value-of select="f:getEdifactPosition($actualSegment)"/>}
+          [SG16/SG22/TAX/C243/5278]:  The value 'Duty or tax or free rate' must have exactly 2 digits '<value-of select="."/>'.</report>
 		</rule>
 	</pattern>
 	<!-- Business check -->
@@ -955,9 +1183,24 @@
         occur maximum 1 time.</report>
 			<report test="count(./S_IMD[/C_C273/D_1131 = 'OAG']) > 1">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/IMD]: The IMD with Code list identification code 'OAG' must
         occur maximum 1 time.</report>
+			<report test="count(./S_IMD/C_C273[D_7009 = 'RD' or D_7009 = 'IN' or D_1131 = 'OAG']) = 0">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/IMD]: The IMD is mandatory 
+			per Belgian law to provide a description as free text of the trade items.</report>
 		</rule>
 	</pattern>
 	<!-- QTY -->
+<!--	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG26">
+			<let name="actualSegment" value="if (exists(./S_QTY))
+          then
+            (./S_QTY[last()])
+          else
+            (./S_LIN[last()])"/>
+			<report test="1 = 1">
+				<value-of select="count(./S_QTY[C_C186/D_6063 = '47'])"/> <value-of select="count(./S_QTY/C_C186[D_6063 = '46' or D_6063 = '194'])"/> <value-of select="$isAdjustment"/>  
+			</report>
+		</rule>
+	</pattern>-->
+	
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG26">
 			<let name="actualSegment" value="if (exists(./S_QTY))
@@ -979,11 +1222,17 @@
         must occur maximum 1 time.</report>
 			<!-- At least one of those quantity should be present -->
 			<report test="count(./S_QTY/C_C186[D_6063 = '47' or D_6063 = '61' or D_6063 = '124']) = 0">{<value-of select="f:getEdifactPosition($actualSegment)"/>}
-			[SG26/QTY/C186/6063]: The minimum information about QTY+ is missing, you need to specify at least one of those: QTY+47 (classic invoice), QTY+61 (returned quantity) or QTY+124 (damaged goods).</report>
-			<report test="count(./S_QTY[C_C186/D_6063 = '47']) = 1 and count(./S_QTY/C_C186[D_6063 = '46' or D_6063 = '194']) = 0">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: The QTY+194 or the QTY+46
-        must occur exactly 1 time if QTY+47 is present.</report>
-			<report test="count(./S_QTY[C_C186/D_6063 = '124']) = 1 and orderType != 381">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: The QTY+124 (damaged goods) can only be used in case of Credit Note (BGM+381)
-			</report>
+			[SG26/QTY/C186/6063]: QTY+47 must occur on each line of an initial invoice or additional invoice or credit note. Except if returned trade items, consumer empties or RTIs are mentioned (QTY+61) or destructed trade items are mentioned (QTY+124).</report>
+			<report test="count(./S_QTY[C_C186/D_6063 = '47']) = 1 and count(./S_QTY/C_C186[D_6063 = '46' or D_6063 = '194']) = 0 and $orderType != '381' and not(exists(/INTERCHANGE/M_INVOIC/S_ALI[D_4183 = '79E']))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: QTY+46 (or QTY+194 in case of invoice based on RECADV), must occur on each invoice line of the initial invoice
+			(except if returned consumer empties or RTIs are mentioned).</report>
+			<report test="count(./S_QTY[C_C186/D_6063 = '46']) > 0 and exists(/INTERCHANGE/M_INVOIC/S_ALI[D_4183 = '79E'])">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: QTY+46 must not occur on each line of an additional invoice or credit note.</report>
+			<report test="count(./S_QTY[C_C186/D_6063 = '46']) > 0 and exists(/INTERCHANGE/M_INVOIC/G_SG1/S_RFF[C_C506/D_1153 = 'ALO'])">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: QTY+46 must not occur on invoice based on receiving advice (RECADV). QTY+46 must be replaced by QTY+194.</report>
+			<report test="count(./S_QTY[C_C186/D_6063 = '124']) = 1 and ($orderType != '381' or exists(/INTERCHANGE/M_INVOIC/S_ALI[D_4183 = '79E']) or exists(/INTERCHANGE/M_INVOIC/G_SG1/S_RFF[C_C506/D_1153 = 'ALQ']))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: The QTY+124 (damaged goods) can only be used in case of corrective Credit Note "over invoicing" (BGM+381 and no ALI+++79E and RFF+ALQ present).</report>
+			<report test="count(./S_QTY[C_C186/D_6063 = '192']) = 1 and (exists(/INTERCHANGE/M_INVOIC/S_ALI[D_4183 = '79E']) or exists(/INTERCHANGE/M_INVOIC/G_SG1/S_RFF[C_C506/D_1153 = 'ALQ']) or exists(/INTERCHANGE/M_INVOIC/G_SG1/S_RFF[C_C506/D_1153 = 'ACE']))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: The QTY+192 (free goods) can only be used in case non-corrective Invoice or Credit Note (no ALI+++79E and RFF+ALQ and RFF+ACE present).</report>
+			<report test="count(./S_QTY[C_C186/D_6063 = '61']) = 1 and ($orderType != '381' or exists(/INTERCHANGE/M_INVOIC/S_ALI[D_4183 = '79E']) or exists(/INTERCHANGE/M_INVOIC/G_SG1/S_RFF[C_C506/D_1153 = 'ACE']))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: The QTY+61 (RTI goods) can only be used in case of return Credit Note (BGM+381 and no ALI+++79E and RFF+ACE present).</report>
+			<report test="count(./S_QTY[C_C186/D_6063 = '61']) = 1 and not(exists(./S_IMD/C_C273[D_7009 = 'RD'])) and $orderType = '380'">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: The QTY+61 (returned goods) can only be used in case of IMD+F++RD (refundable deposit items).</report>
+			<report test="count(./S_QTY[C_C186/D_6063 = '61']) = 1 and exists(./S_QTY/C_C186[D_6063 = '46' or D_6063 = '47'])">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: The QTY+61 (returned goods) can not be used in combination with QTY+46 and QTY+47.</report>
+			<report test="count(./S_QTY[C_C186/D_6063 = '124']) = 1 and $orderType = '381' and exists(./S_QTY/C_C186[D_6063 = '46' or D_6063 = '47'])">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: The QTY+124 (damaged goods) can not be used in combination with QTY+46 and QTY+47 when credit note.</report>
 		</rule>
 	</pattern>
 
@@ -1075,9 +1324,9 @@
 		</rule>
 	</pattern>
 	<pattern>
-		<rule context="/INTERCHANGE/M_INVOIC/G_SG26/S_QTY[C_C186/D_6063 = 124]">
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG26/S_QTY[C_C186/D_6063 = '124']">
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
-			<report test="./C_C186/D_6063 = '124' and $orderType!='381'">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: The QTY+124 can be only use in case og damaged goods in a Credit Note (BGM+381).</report>
+			<report test="./C_C186/D_6063 = '124' and $orderType != '381'">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/QTY/C186/6063]: The QTY+124 can be only use in case og damaged goods in a Credit Note (BGM+381).</report>
 		</rule>
 	</pattern>
 
@@ -1103,10 +1352,10 @@
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG26/S_DTM">
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
-			<let name="hdrDTM" value="exists(/INTERCHANGE/M_INVOIC/G_SG1/S_DTM[C_C507/D_2005 = '1' or C_C507/D_2005 = '35'])"/>
+			<let name="hdrDTM" value="exists(/INTERCHANGE/M_INVOIC/S_DTM[C_C507/D_2005 = '1' or C_C507/D_2005 = '35'])"/>
 			<let name="qual" value="./C_C507/D_2005"/>
 			<report test="not($hdrDTM)">
-        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/DTM]: The SG26/DTM segment with qualifier '<value-of select="$qual"/>' cannot appears if there is no DTM+1 or DTM+35 at header level.</report>
+        {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/DTM]: The SG26/DTM segment with qualifier '<value-of select="$qual"/>' cannot appear if there is no DTM+1 or DTM+35 at header level.</report>
 		</rule>
 	</pattern>
 
@@ -1137,9 +1386,10 @@
 			<assert test="$codelist//Code[@id = 'SG27_MOA_5025']/enumeration[@value = $codeValue]">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/SG27/MOA/C516/5025]: The value '<value-of select="$codeValue"/>' for SG26/SG27/MOA with
         qualifier ('5025') is not correct. The value should be '203' or '496'.</assert>
+
 		</rule>
 	</pattern>
-
+		
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG26">
 			<let name="actualSegment" value="if (exists(./G_SG26/S_MOA/C_C516[D_5025 = '496']))
@@ -1153,6 +1403,15 @@
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/SG27/MOA]: The SG26/SG27/MOA segment with qualifier '496' must appear in case of RTI/assets and/or consumer empties.</report>
 			<report test="not($isRTI) and $MOA_496">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/SG27/MOA]: The SG26/SG27/MOA segment with qualifier '496' can only appear in case of RTI/assets and/or consumer empties.</report>
+		</rule>
+	</pattern>
+	
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG26">
+			<let name="actualSegment" value="(./S_LIN)"/>
+				<report
+		test="count(./G_SG27/S_MOA/C_C516[D_5025 = '203' or '496']) = 0"
+        > {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/SG27/MOA] The segment SG26/SG27/MOA segment with qualifier '203' or '496' is mandatory. </report>
 		</rule>
 	</pattern>
 
@@ -1336,8 +1595,21 @@
             (./G_SG34[last()]/S_TAX)
           else
             (./S_LIN[last()])"/>
-			<report test="count(./G_SG34/S_TAX) = 1 and not(exists(./S_LIN/C_C212))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/SG34/TAX]: The SG34/TAX must not occurs for RTI/assets and consumer empties case.</report>
-			<report test="count(./G_SG34/S_TAX) = 0 and exists(./S_LIN/C_C212) and ./S_IMD[/C_C273/D_7009 != 'RD']">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/SG34/TAX]: The SG34/TAX must occur maximum 1 time by Item Line (except for RTI/assets and consumer empties)</report>
+			<report test="count(./G_SG34/S_TAX) = 1 and not(exists(./S_LIN/C_C212))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/SG34/TAX]: The SG34/TAX must not occur for RTI/assets and consumer empties case.</report>
+			<report test="count(./G_SG34/S_TAX) = 0 and not(exists(./S_IMD/C_C273[D_7009 = 'RD']))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/SG34/TAX]: The SG34/TAX must occur 1 time for Trade Items (except for RTI/assets and consumer empties)</report>
+			<report test="count(./G_SG34/S_TAX) = 1 and not(exists(./S_IMD/C_C273[D_7009 = 'RD'])) and ./G_SG34/S_TAX/C_C241/D_5153 = 'VAT' and exists(./G_SG34/S_TAX/C_C243/D_5278) and format-number(./G_SG34/S_TAX/C_C243/D_5278,'0.00') != '6.00'and format-number(./G_SG34/S_TAX/C_C243/D_5278,'0.00') != '12.00'and format-number(./G_SG34/S_TAX/C_C243/D_5278,'0.00') != '21.00'">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/SG34/TAX]: Invalid SG34/TAX rate for 'VAT'. Must be '6.00', '12.00' or '21.00' for Trade Items.</report>
+		</rule>
+	</pattern>
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG26/G_SG34/S_TAX/C_C243/D_5278">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="not(number(.)) and . != 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG26/SG34/TAX/C243/5278]: The value 'Duty or tax or free rate' is not a number.</report>
+			<report test="string-length(substring-after(., '.')) &gt; 2">
+	  {<value-of select="f:getEdifactPosition($actualSegment)"/>}
+          [SG26/SG34/TAX/C243/5278]:  The value 'Duty or tax or free rate' has more than 2 digits '<value-of select="."/>'.</report>
+		  	<report test="string-length(substring-after(., '.')) != 2">
+	  {<value-of select="f:getEdifactPosition($actualSegment)"/>}
+          [SG26/SG34/TAX/C243/5278]:  The value 'Duty or tax or free rate' must have exactly 2 digits '<value-of select="."/>'.</report>
 		</rule>
 	</pattern>
 	<!-- Business check -->
@@ -1572,6 +1844,18 @@
           [SG39/SG44/TAX/C243/5278]:  The value 'Duty or tax or free rate' has more than 2 digits '<value-of select="."/>'.</report>
 		</rule>
 	</pattern>
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG39/G_SG44/S_TAX/C_C243/D_5278">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<report test="not(number(.)) and . != 0"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG39/SG44/TAX/C243/5278]: The value 'Duty or tax or free rate' is not a number.</report>
+			<report test="string-length(substring-after(., '.')) &gt; 2">
+	  {<value-of select="f:getEdifactPosition($actualSegment)"/>}
+          [SG39/SG44/TAX/C243/5278]:  The value 'Duty or tax or free rate' has more than 2 digits '<value-of select="."/>'.</report>
+		  	<report test="string-length(substring-after(., '.')) != 2">
+	  {<value-of select="f:getEdifactPosition($actualSegment)"/>}
+          [SG39/SG44/TAX/C243/5278]:  The value 'Duty or tax or free rate' must have exactly 2 digits '<value-of select="."/>'.</report>
+		</rule>
+	</pattern>
 	<!-- Business check -->
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG39/G_SG44/S_TAX">
@@ -1624,8 +1908,9 @@
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG50/S_MOA/C_C516/D_5004">
 			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<let name="totalamountvat" value="/INTERCHANGE/M_INVOIC/G_SG50/S_MOA/C_C516/D_5004"/>
 			<report test="string-length(substring-after(., '.')) &gt; 4" role="warning">
-				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA/C516/5004]: The EANCOM recommends max. 4 digits for the value '<value-of select="."/>'.
+				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA/C516/5004]: The EANCOM recommends max. 4 digits after '<value-of select="."/>'.
 			</report>
 		</rule>
 	</pattern>
@@ -1633,14 +1918,15 @@
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC">
 			<let name="actualSegment" value="./G_SG50[last()]/S_MOA"/>
+			<let name="totalamountvat" value="/INTERCHANGE/M_INVOIC/G_SG50/S_MOA/C_C516/D_5004"/>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '9']) > 1">
 				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+9 must occur maximum one time.
 			</report>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '77']) != 1">
-				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+77 must occurs exactly one time.
+				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+77 must occur exactly one time.
 			</report>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '79']) != 1">
-				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+79 must occurs exactly one time.
+				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+79 must occur exactly one time.
 			</report>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '113']) > 1">
 				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+113 must occur maximum one time.
@@ -1649,7 +1935,7 @@
 				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+129 must occur maximum one time.
 			</report>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '150']) != 1">
-				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+150 must occurs exactly one time.
+				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+150 must occur exactly one time.
 			</report>
 			<report test="count(./G_SG50/S_MOA[C_C516/D_5025 = '176']) > 1">
 				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: The SG50/MOA+176 must occur maximum one time.
@@ -1659,7 +1945,26 @@
 			</report>
 		</rule>
 	</pattern>
+	
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG50/S_MOA[C_C516/D_5025 = '150']">
+			<let name="actualSegment" value="ancestor-or-self::*[starts-with(name(),'S_')]"/>
+			<let name="totalamountvat" value="number(./C_C516/D_5004)"/>
+			<report test="$totalamountvat > 0.00 and not(exists(/INTERCHANGE/M_INVOIC/S_FTX[D_4451 = 'TXD'])) and exists(/INTERCHANGE/M_INVOIC/S_BGM[C_C002/D_1001 = '381'])">
+				{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG50/MOA]: CreditNote should hold text in FTX+TXD to refund tax to the state. 
+			</report>
+		</rule>
+	</pattern>
 
+<!--	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC">
+			<let name="totalamountvat" value="/INTERCHANGE/M_INVOIC/G_SG50[last()]/S_MOA/C_C516/D_5004"/>
+			<report test="1 = 1">
+				{<value-of select="count(./G_SG50/S_MOA[C_C516/D_5025 = '150'])"/>} isCreditNote '<value-of select="$isCreditNote"/>' isFreeTextPresent '<value-of select="$isFreeTextPresent"/>' totalamountvat '<value-of select="$totalamountvat"/>'   
+			</report>
+		</rule>
+	</pattern>-->
+	
 	<!-- SG50/SG51/RFF-->
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC/G_SG50/G_SG51/S_RFF/C_C506/D_1153">
@@ -1757,6 +2062,9 @@
 			<report test="string-length(substring-after(., '.')) &gt; 2">
 	  {<value-of select="f:getEdifactPosition($actualSegment)"/>}
           [SG52/TAX/C243/5278]:  The value 'Duty or tax or free rate' has more than 2 digits '<value-of select="."/>'.</report>
+			<report test="string-length(substring-after(., '.')) != 2">
+	  {<value-of select="f:getEdifactPosition($actualSegment)"/>}
+          [SG52/TAX/C243/5278]:  The value 'Duty or tax or free rate' must have exactly 2 digits '<value-of select="."/>'.</report>
 		</rule>
 	</pattern>
 	<!-- Business check -->
@@ -1773,6 +2081,7 @@
 	  [SG52/TAX/C243]: The Duty or tax or fee rate code ('5279') for SG52/TAX should not be present if the Duty or tax or fee rate is present '<value-of select="./C_C243/D_5279"/>'.</report>
 			<report test="not(exists(./C_C243/D_5278)) and not(exists(./C_C243/D_5279))  and ./D_5305 = 'AE'"> {<value-of select="f:getEdifactPosition($actualSegment)"/>}
 	  [SG52/TAX/C243]: The Duty or tax or fee rate code ('5279') or Duty or tax or fee rate ('5278') the for SG52/TAX should be present. None of them are actually present.</report>
+	  		<report test="./C_C241/D_5153 = 'VAT' and exists(./C_C243/D_5278) and format-number(./C_C243/D_5278,'0.00') != '6.00'and format-number(./C_C243/D_5278,'0.00') != '12.00'and format-number(./C_C243/D_5278,'0.00') != '21.00'">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG52/TAX]: Invalid SG52/TAX rate for 'VAT'. Must be '6.00', '12.00' or '21.00'.</report>
 		</rule>
 	</pattern>
 
@@ -1784,6 +2093,8 @@
 			<assert test="$codelist//Code[@id = 'SG52_MOA_5025']/enumeration[@value = $codeValue]">
         {<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG52/MOA/C516/5025]: The value '<value-of select="$codeValue"/>' for SG52/MOA with
         qualifier ('5025') is not correct. The value should be '124' or '04G' or 'B10'.</assert>
+			<report test=". = 'B10' and (not(exists(/INTERCHANGE/M_INVOIC/G_SG8/S_PAT[D_4279 = '22'])) or not(exists(/INTERCHANGE/M_INVOIC/G_SG16/S_ALC[C_C214/D_7161 = 'EAB'])))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG52/MOA/C516/5025]: DE 5025 The element MOA+B10 must occur in combination with #18 PAT+22 and #31 ALC+A++++EAB.</report>
+			<report test=". = '124' and exists(/INTERCHANGE/M_INVOIC/G_SG8/S_PAT[D_4279 = '22']) and exists(/INTERCHANGE/M_INVOIC/G_SG16/S_ALC[C_C214/D_7161 = 'EAB']) and not(exists(ancestor-or-self::*[starts-with(name(),'G_SG52')]/S_MOA[C_C516/D_5025 = 'B10']))">{<value-of select="f:getEdifactPosition($actualSegment)"/>}[SG52/MOA/C516/5025]: DE 5025 The element MOA+B10 must occur in combination with #18 PAT+22 and #31 ALC+A++++EAB.</report>
 		</rule>
 	</pattern>
 	<!-- Ignored segment in this context --> 
@@ -2063,6 +2374,5 @@
 		</xsl:variable>
 		<xsl:value-of select="substring($posSegment, 1, string-length($posSegment) - 1)"/>
 	</xsl:function>
-
 
 </schema>

@@ -3,6 +3,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<ns uri="functions:1.0" prefix="f"/>
+	<ns uri="http://exslt.org/math" prefix="math"/>
 
 	<!-- Reference documents and variables -->
 	<let name="allSegment" value="//*[starts-with(name(), 'S_') or starts-with(name(), 'G_')]"/>
@@ -11,8 +12,97 @@
 	<let name ="inv" value="/INTERCHANGE/M_INVOIC"/>
 
 	<!-- Percentage discount for prompt Payment -->
-
 	<title>Schema for HO2C-V3-INVOIC-Calculation; 2002; EAN</title>
+	
+	<!-- Correcting errors (made in previous invoice) -->
+	<let name="isAdjustment" value="exists(/INTERCHANGE/M_INVOIC/S_ALI[D_4183 = '79E'])"/>
+	
+	<!-- orderType = invoice or creditnote code (380 or 381) -->
+	<let name="orderType" value="xs:string(/INTERCHANGE/M_INVOIC/S_BGM/C_C002/D_1001)"/>
+	
+<!--	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC">
+			<report test="1 = 1">
+				Killroy was here!   
+			</report>
+		</rule>
+	</pattern>-->
+	
+	<!-- Rule DE 5402 test: Reference Currency x Rate of exchange = Target Currency -->
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG50[S_MOA/C_C516/D_5025 = '176']">
+			<let name="actualSegment" value="./S_MOA[last()]"/>
+			<let name="rateOfExchange" value="number($inv/G_SG7/S_CUX/D_5402)"/>
+			<let name="invoiceVatAmountRefCurr" value="number($inv/G_SG50/S_MOA[C_C516/D_5025 = '150']/C_C516/D_5004)"/>
+			<let name="invoiceVatAmountTarCurr" value="number(./S_MOA[C_C516/D_5025 = '176']/C_C516/D_5004)"/>
+			
+			<report test="(format-number($invoiceVatAmountTarCurr,'0.0000') != format-number($invoiceVatAmountRefCurr * $rateOfExchange,'0.0000'))">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
+			[#83 SG50/MOA+176] - Tax Exchange Calculation error: (Reference Currency x Rate of exchange != Target Currency).\n
+			Actual value for MOA+176: <value-of select="$invoiceVatAmountTarCurr"/> != <value-of select="$invoiceVatAmountRefCurr"/> * <value-of select="$rateOfExchange"/>. \n
+			</report>
+			<report test="not(exists(./S_MOA[C_C516/D_5025 = '176']/C_C516/D_6343))">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
+			[#83 SG50/MOA+176] - Currency type code qualifier ('10E') not present. \n
+			</report>
+			<report test="./S_MOA[C_C516/D_5025 = '176']/C_C516/D_6345 != $inv/G_SG7/S_CUX/C_C504[2]/D_6345">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
+			[#83 SG50/MOA+176] - Currency identification code MOA+176: <value-of select="./S_MOA[C_C516/D_5025 = '176']/C_C516/D_6345"/> must be equal to target currency identification code in CUX+2: <value-of select="$inv/G_SG7/S_CUX/C_C504[2]/D_6345"/>.\n
+			</report>
+		</rule>
+	</pattern>
+
+	<!-- Rule DE 5125 test: PRI+AAA = (PRI+AAB) - (ALC+A) + (ALC+C) -->
+	<pattern>
+		<rule context="/INTERCHANGE/M_INVOIC/G_SG26">
+			<let name="actualSegment" value="if (exists(./G_SG29[last()]/S_PRI))
+          then
+            (./G_SG29[last()]/S_PRI)
+          else
+            (./S_LIN[last()])"/>
+			
+			<!-- Determine prices, allowances and charges -->
+			<let name="invoicedQuantity_10" value="number(if (exists(./S_QTY[C_C186/D_6063 = '124']/C_C186/D_6060)) then (./S_QTY[C_C186/D_6063 = '124']/C_C186/D_6060) else if (exists(./S_QTY[C_C186/D_6063 = '61']/C_C186/D_6060)) then (./S_QTY[C_C186/D_6063 = '61']/C_C186/D_6060) else (./S_QTY[C_C186/D_6063 = '47']/C_C186/D_6060))"/>
+			<let name="calcGrossPriceMult_9" value="number(if (exists(./G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5284)) then (./G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5284) else ('1'))"/>
+			<let name="grossPrice" value="number(./G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5118) div $calcGrossPriceMult_9"/>
+			<let name="calcNetPriceMult_9" value="number(if (exists(./G_SG29/S_PRI[C_C509/D_5125 = 'AAA']/C_C509/D_5284)) then (./G_SG29/S_PRI[C_C509/D_5125 = 'AAA']/C_C509/D_5284) else ('1'))"/>
+			<let name="netPriceBaseValue" value="number(./G_SG29/S_PRI[C_C509/D_5125 = 'AAA']/C_C509/D_5118) div $calcNetPriceMult_9"/>
+			<let name="netPrice" value="number(./G_SG29/S_PRI[C_C509/D_5125 = 'AAA']/C_C509/D_5118) div $calcNetPriceMult_9"/>
+			<!-- Charge Amount by line -->
+			<let name="sumChargeAmountLine_13" value="number(if (exists(./G_SG39/G_SG44/S_MOA[C_C516/D_5025 = '23']/C_C516/D_5004)) then (sum(./G_SG39/G_SG44/S_MOA[C_C516/D_5025 = '23']/C_C516/D_5004)) else ('0'))"/>
+			<!-- Allowance amount by line -->
+			<let name="sumAllowanceAmountLine_14" value="number(if (exists(./G_SG39/G_SG44/S_MOA[C_C516/D_5025 = '204']/C_C516/D_5004)) then (sum(./G_SG39/G_SG44/S_MOA[C_C516/D_5025 = '204']/C_C516/D_5004)) else('0'))"/>
+			<let name="allowancePrice" value="number(if (exists(./G_SG39/S_ALC[D_5463 = 'A']/C_C214/D_7161)) then ($sumAllowanceAmountLine_14 div $invoicedQuantity_10) else ('0'))"/>
+			<let name="chargePrice" value="number(if (exists(./G_SG39/S_ALC[D_5463 = 'C']/C_C214/D_7161)) then ($sumChargeAmountLine_13 div $invoicedQuantity_10) else ('0'))"/>
+			<let name="itemAmount" value="number(if (exists(./G_SG27/S_MOA[C_C516/D_5025 = '203']/C_C516/D_5004)) then sum(./G_SG27/S_MOA[C_C516/D_5025 = '203']/C_C516/D_5004) else ('0'))"/>
+			<let name="decimals203" value="substring-after(./G_SG27/S_MOA[C_C516/D_5025 = '203']/C_C516/D_5004,'.')"/>
+			<let name="decimalPlaces" value="if (string-length($decimals203) = 0) then 1 else math:power(10, string-length($decimals203))"/>
+			<let name="itemAmountEqual" value="$itemAmount = round((($grossPrice * $invoicedQuantity_10) - $sumAllowanceAmountLine_14 + $sumChargeAmountLine_13) * $decimalPlaces) div $decimalPlaces"/>
+
+			<report test="($netPriceBaseValue != $grossPrice - $allowancePrice + $chargePrice) and not(exists(./S_IMD/C_C273[D_7009 = 'RD']))">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
+			[SG26/LIN] - Gross/Net price error: [(#54 PRI+AAA) / (unit price basis value)] = [(PRI+AAB) / (unit price basis value)] - (ALC+A) + (ALC+C). \n
+			Actual value for PRI+AAA: <value-of select="$netPriceBaseValue"/> != <value-of select="$grossPrice"/> - <value-of select="$allowancePrice"/> - <value-of select="$chargePrice"/>. \n
+			</report> 
+			<report test="not($itemAmountEqual) and not(exists(./S_IMD/C_C273[D_7009 = 'RD']))">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
+			[SG26/LIN] - Item Amount error (precision based on decimals in MOA+203): (#49 MOA+203) = [(PRI+AAB) * (QTY+47) / (unit price basis value)] - (ALC+A) + (ALC+C). \n
+			Actual value for MOA+203: <value-of select="$itemAmount"/> != [<value-of select="$grossPrice"/> * <value-of select="$invoicedQuantity_10"/>] - <value-of select="$sumAllowanceAmountLine_14"/> + 
+			<value-of select="$sumChargeAmountLine_13"/>. ItemAmount = <value-of select="$itemAmount"/> Calculated amount = <value-of select="round((($grossPrice * $invoicedQuantity_10) - $sumAllowanceAmountLine_14 + $sumChargeAmountLine_13) * $decimalPlaces) div $decimalPlaces"/> \n
+			</report>
+			<report test="($itemAmount != round(($netPrice * $invoicedQuantity_10) * $decimalPlaces) div $decimalPlaces) and not(exists(./S_IMD/C_C273[D_7009 = 'RD']))">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
+			[SG26/LIN] - Line item amount error: (#49 MOA+203) = (PRI+AAA) * (QTY+47) / (unit price basis value). \n
+			Actual value for MOA+203: <value-of select="$itemAmount"/> != <value-of select="$netPrice"/> * <value-of select="$invoicedQuantity_10"/> \n
+			</report>
+			<report test="(format-number($itemAmount,'0.000000') != format-number(($grossPrice * $invoicedQuantity_10) - $sumAllowanceAmountLine_14 + $sumChargeAmountLine_13,'0.000000')) and not(exists(./S_IMD/C_C273[D_7009 = 'RD']))" role="warn">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
+			[SG26/LIN] - Item Amount error (precision based on max. decimals (6) allowed in MOA+203): (#49 MOA+203) = [(PRI+AAB) * (QTY+47) / (unit price basis value)] - (ALC+A) + (ALC+C). \n
+			Actual value for MOA+203: <value-of select="$itemAmount"/> != [<value-of select="$grossPrice"/> * <value-of select="$invoicedQuantity_10"/>] - <value-of select="$sumAllowanceAmountLine_14"/> + 
+			<value-of select="$sumChargeAmountLine_13"/>. \n
+			</report>
+		</rule>
+	</pattern>
 
 	<!-- Rule F test -->
 	<pattern>
@@ -20,7 +110,7 @@
 			<let name="actualSegment" value="./S_LIN"/>
 			
 			<!-- Get the quantity invoiced or the returned quantity -->
-			<let name="invoicedQuantity_10" value="number(if (exists(./S_QTY[C_C186/D_6063 = '61']/C_C186/D_6060)) then (./S_QTY[C_C186/D_6063 = '61']/C_C186/D_6060) else (./S_QTY[C_C186/D_6063 = '47']/C_C186/D_6060))"/>
+			<let name="invoicedQuantity_10" value="number(if (exists(./S_QTY[C_C186/D_6063 = '124']/C_C186/D_6060)) then (./S_QTY[C_C186/D_6063 = '124']/C_C186/D_6060) else if (exists(./S_QTY[C_C186/D_6063 = '61']/C_C186/D_6060)) then (./S_QTY[C_C186/D_6063 = '61']/C_C186/D_6060) else (./S_QTY[C_C186/D_6063 = '47']/C_C186/D_6060))"/>
 			<!-- Multiply factor for the Price-->
 			<let name="calcGrossPriceMult_9" value="number(if (exists(./G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5284)) then (./G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5284) else ('1'))"/>
 			<let name="calcGrossPriceUnit_11" value="number(./G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5118) div $calcGrossPriceMult_9"/>
@@ -144,7 +234,7 @@
 			<let name="ruleD" value="number(($sumtaxBasisAmountExclPD_3 - $paymentDiscountAmount_6) * $taxRate * 0.01)"/>
 
 			<!-- Rule B - Check that resultE = taxBasisAmountExclude but the MOA+04G must exist -->
-			<report test="(format-number($ruleD,'0.00') != format-number($totalVatAmount_1,'0.00')) and string($taxRate) != 'NaN'">
+			<report test="(format-number($ruleD,'0.00') != format-number($totalVatAmount_1,'0.00')) and exists(./S_TAX/C_C243/D_5278)">
 			{<value-of select="f:getEdifactPosition($actualSegment)"/>}
 			[UNS] - RULE D error: (#87 MOA+124)rate = (#87 MOA+B10)rate * rate. \n
 			Actual value for MOA+124: <value-of select="format-number($totalVatAmount_1,'0.00')"/> != (<value-of select="$sumtaxBasisAmountExclPD_3"/> - <value-of select="$paymentDiscountAmount_6"/>) * <value-of select="$taxRate * 0.01"/>. \n
@@ -232,6 +322,8 @@
 			<let name="quantityDepositUnit_24a" value="number(./S_QTY[C_C186/D_6063 = '47']/C_C186/D_6060)"/>
 			<!-- Quantity deposit units - Returned -->
 			<let name="quantityDepositUnit_24b" value="number(./S_QTY[C_C186/D_6063 = '61']/C_C186/D_6060)"/>
+			<!-- Quantity deposit units - Damaged goods -->
+			<let name="quantityDepositUnit_24c" value="number(./S_QTY[C_C186/D_6063 = '124']/C_C186/D_6060)"/>
 			<!-- Deposit net price -->
 			<let name="depositNetPrice_16" value="number(./G_SG29/S_PRI[C_C509/D_5125 = 'AAA']/C_C509/D_5118)"/>	
 			<!-- Expected result: Total returnable packages deposit amount -->
@@ -239,6 +331,7 @@
 			<!-- Result from rule G -->
 			<let name="ruleG_a" value="number($quantityDepositUnit_24a * $depositNetPrice_16)"/>
 			<let name="ruleG_b" value="number($quantityDepositUnit_24b * $depositNetPrice_16)"/>
+			<let name="ruleG_c" value="number($quantityDepositUnit_24c * $depositNetPrice_16)"/>
 
 			<!-- Rule G - RTI charge check on Line Level -->
 			<report test="($ruleG_a != $totalReturnablePackageDepositAmount_26) and exists(./S_QTY[C_C186/D_6063 = '47']/C_C186/D_6060)">
@@ -255,9 +348,17 @@
 			Actual value for MOA+496 on LIN+<value-of select="./S_LIN/D_1082"/>: <value-of select="$totalReturnablePackageDepositAmount_26"/> != <value-of select="$quantityDepositUnit_24b"/> * <value-of select="$depositNetPrice_16"/>. \n
 			Expected value for MOA+496 on LIN+<value-of select="./S_LIN/D_1082"/>:  <value-of select="$ruleG_b"/>
 			</report> 
+			
+			<!-- Rule G - Damaged goods check on Line Level -->
+			<report test="($ruleG_c != $totalReturnablePackageDepositAmount_26) and exists(./S_QTY[C_C186/D_6063 = '124']/C_C186/D_6060)">
+			{<value-of select="f:getEdifactPosition($actualSegment)"/>} 
+			[UNS] - RULE G error: #54 MOA+496 = (#54 PRI+AAA) * (#43 QTY+124). \n
+			Actual value for MOA+496 on LIN+<value-of select="./S_LIN/D_1082"/>: <value-of select="$totalReturnablePackageDepositAmount_26"/> != <value-of select="$quantityDepositUnit_24c"/> * <value-of select="$depositNetPrice_16"/>. \n
+			Expected value for MOA+496 on LIN+<value-of select="./S_LIN/D_1082"/>:  <value-of select="$ruleG_c"/>
+			</report>
 		</rule>
 	</pattern>
-
+	
 	<!-- Rule H test --> 
 	<pattern>
 		<rule context="/INTERCHANGE/M_INVOIC[G_SG50/S_MOA/C_C516/D_5025 = '79']">
@@ -266,9 +367,9 @@
 			<!-- Taxable basis amount excluding payment discout => Compared with ruleE -->
 			<let name="taxBasisAmountExclPD_3" value="number(if (exists(./G_SG52/S_MOA[C_C516/D_5025 = '04G']/C_C516/D_5004)) then (sum($inv/G_SG52/S_MOA[C_C516/D_5025 = '04G']/C_C516/D_5004)) else ('0'))"/>
 			<!-- Total returnable packages deposit amount chargeable -->
-			<let name="sumTotalReturnablePackageDepositAmount_26a" value="number(sum(./G_SG26[not(S_QTY/C_C186/D_6063 = '61')]/G_SG27/S_MOA[C_C516/D_5025 = '496']/C_C516/D_5004))"/>
+			<let name="sumTotalReturnablePackageDepositAmount_26a" value="number(if ($orderType = '380') then sum(./G_SG26[not(S_QTY/C_C186/D_6063 = '61')]/G_SG27/S_MOA[C_C516/D_5025 = '496']/C_C516/D_5004) else sum(./G_SG26[S_QTY/C_C186/D_6063 = '61']/G_SG27/S_MOA[C_C516/D_5025 = '496']/C_C516/D_5004))"/>
 			<!-- Total returnable packages deposit amount returned -->
-			<let name="sumTotalReturnablePackageDepositAmount_26b" value="number(sum(./G_SG26[S_QTY/C_C186/D_6063 = '61']/G_SG27/S_MOA[C_C516/D_5025 = '496']/C_C516/D_5004))"/>
+			<let name="sumTotalReturnablePackageDepositAmount_26b" value="number(if ($orderType = '380') then sum(./G_SG26[S_QTY/C_C186/D_6063 = '61']/G_SG27/S_MOA[C_C516/D_5025 = '496']/C_C516/D_5004) else ('0'))"/>
 			<!-- Expected result: Total Taxable Amount -->
 			<let name="totalTaxableAmount_79" value="number(./G_SG50/S_MOA[C_C516/D_5025 = '79']/C_C516/D_5004)"/>
 			<!-- Result from rule H -->
@@ -294,7 +395,7 @@
 			<let name="actualSegment" value="./S_LIN[last()]"/>
 
 			<!-- Delivered Quantity -->
-			<let name="deliveredQuantity_21" value="number(
+			<let name="delivered46" value="number(
 				if (exists(./S_QTY[C_C186/D_6063 = '46' and exists(C_C186/D_6411)])) then
 					(./S_QTY[C_C186/D_6063 = '46' and exists(C_C186/D_6411)]/C_C186/D_6060) else 
 					(./S_QTY[C_C186/D_6063 = '46']/C_C186/D_6060)
@@ -314,13 +415,20 @@
 					(./S_QTY[C_C186/D_6063 = '47' and exists(C_C186/D_6411)]/C_C186/D_6060) else 
 					(./S_QTY[C_C186/D_6063 = '47']/C_C186/D_6060)
 				)"/>
+				
+			<let name="deliveredQuantity_21" value="number(
+				if (exists(./S_QTY[C_C186/D_6063 != '46']) and $isAdjustment = true and string($delivered46) = 'NaN') then
+					($invoicedQuantity_10) else
+					($delivered46)
+				)"/>
+				
 			<!-- Result from rule K -->
 			<let name="ruleK" value="number($deliveredQuantity_21 * $unitOfMeasure_22)"/>
 			<!-- Result from rule L -->
 			<let name="ruleL" value="number($deliveredQuantity_21 * $unitOfMeasure_22) - $freeGoodsQuantity_23"/>
 
 			<!-- Rule K - check when MEA present -->
-			<report test="($ruleK != $invoicedQuantity_10 and exists(./S_MEA/C_C174/D_6314))">
+			<report test="($ruleK != $invoicedQuantity_10 and exists(./S_MEA/C_C174/D_6314)) and string($deliveredQuantity_21) != 'NaN'">
 			{<value-of select="f:getEdifactPosition($actualSegment)"/>} 
 			[QTY] - RULE K error on LIN+<value-of select="./S_LIN/D_1082"/>: #43 QTY+47 = #43 QTY+46 * #42 MEA+ABW. \n
 			Actual value for QTY+47: <value-of select="$invoicedQuantity_10"/> != <value-of select="$deliveredQuantity_21"/> * <value-of select="$unitOfMeasure_22"/>. \n
@@ -328,7 +436,7 @@
 			</report> 
 
 			<!-- Rule L -->
-			<report test="$ruleL != $invoicedQuantity_10 and string($invoicedQuantity_10) != 'NaN'  and string($deliveredQuantity_21) != 'NaN'">
+			<report test="$ruleL != $invoicedQuantity_10 and string($invoicedQuantity_10) != 'NaN' and string($deliveredQuantity_21) != 'NaN'">
 			{<value-of select="f:getEdifactPosition($actualSegment)"/>} 
 			[QTY] - RULE L error on LIN+<value-of select="./S_LIN/D_1082"/>: #43 QTY+47 = (#43 QTY+46 * #42 MEA+ABW) - #43 QTY+192 \n
 			Actual value for QTY+47: <value-of select="$invoicedQuantity_10"/> != <value-of select="$deliveredQuantity_21"/> * <value-of select="$unitOfMeasure_22"/> - <value-of select="$freeGoodsQuantity_23"/> . \n
@@ -349,10 +457,10 @@
 		<xsl:param name="G_SG26" as="node()"/>
 
 		<!-- Get the quantity invoiced or the returned quantity -->
-		<xsl:variable name="invoicedQuantity_10" select="number($G_SG26/S_QTY[C_C186/D_6063 = '47' or C_C186/D_6063 = '61']/C_C186/D_6060)"/>
+		<xsl:variable name="invoicedQuantity_10" select="number($G_SG26/S_QTY[C_C186/D_6063 = '47' or C_C186/D_6063 = '61' or C_C186/D_6063 = '124']/C_C186/D_6060)"/>
 		<!-- Multiply factor for the Price-->
 		<xsl:variable name="calcGrossPriceMult_9" select="number(if (exists($G_SG26/G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5284)) then ($G_SG26/G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5284) else ('1'))"/>
-		<xsl:variable name="calcGrossPriceUnit_11" select="number($G_SG26/G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5118) div $calcGrossPriceMult_9"/>
+		<xsl:variable name="calcGrossPriceUnit_11" select="number($G_SG26/G_SG29/S_PRI[C_C509/D_5125 = 'AAB']/C_C509/D_5118) div $calcGrossPriceMult_9"/>		
 		<!-- Charge Amount by line -->
 		<xsl:variable name="sumChargeAmountLine_13" select="number(if (exists($G_SG26/G_SG39/G_SG44/S_MOA[C_C516/D_5025 = '23']/C_C516/D_5004)) then (sum($G_SG26/G_SG39/G_SG44/S_MOA[C_C516/D_5025 = '23']/C_C516/D_5004)) else ('0'))"/>
 		<!-- Allowance amount by line -->
@@ -361,6 +469,7 @@
 		<xsl:variable name="lineTaxableAmount_12" select="number(sum($G_SG26/G_SG34/S_MOA[C_C516/D_5025 = '125']/C_C516/D_5004))"/>
 		<!-- Rule F result-->
 		<xsl:variable name="ruleF" select="format-number($invoicedQuantity_10 * $calcGrossPriceUnit_11 + $sumChargeAmountLine_13 - $sumAllowanceAmountLine_14,'0.00')"/>
+		<!-- <xsl:variable name="ruleF" select="format-number(round(($invoicedQuantity_10 * $calcGrossPriceUnit_11 + $sumChargeAmountLine_13 - $sumAllowanceAmountLine_14) * 100) div 100,'0.00')"/> -->
 
 		<xsl:value-of select="$ruleF"/>
 	</xsl:function>
